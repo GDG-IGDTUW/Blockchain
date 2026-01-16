@@ -1,7 +1,0 @@
-NEXT_PUBLIC_BACKEND_API=https://dummyapi.com/backend
-
-NEXTAUTH_URL=https://dummyapi.com/auth
-GOOGLE_CLIENT_ID=dummy-google-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=dummy-google-client-secret
-
-NEXTAUTH_SECRET=dummy-secret-key

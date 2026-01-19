@@ -24,11 +24,35 @@ CIRCLE incentivizes genuine user engagement through blockchain-based rewards:
 └── README.md           # This file
 ```
 
-## 📐 Architecture
+## � Architecture
 
-![Architecture Diagram](assets/architecture_diagram.png)
+```text
+       +--------+
+       |  USER  |
+       +----+---+
+            |
+            | 1. Social Action (Post/Like)
+            v
+   +--------+--------+                                +--------------+
+   |    FRONTEND     + -- 4. Connect/Transfer (Tx) -> +   METAMASK   +
+   | (Browser/Client)|                                |   (Wallet)   |
+   +--------+--------+ <---- 5. Signs & Sends ------- +------+-------+
+            |                                                |
+            | 2. API Call                                    | 5. Broadcasts Tx
+            v                                                v
+   +--------+--------+        7. Emits Events         +------+-------+
+   |     BACKEND     + <----------------------------- +  BLOCKCHAIN  +
+   | owner_wallet    |                                |(Smart Contr.)|
+   +--------+--------+ -----------------------------> +--------------+
+            |              3. Distribute Rewards (recordPost)
+            | 2. Write
+            v
+       +--------+
+       |   DB   |
+       +--------+
+```
 
-## 🚀 Getting Started
+## �🚀 Getting Started
 
 ### Prerequisites
 

@@ -1,5 +1,6 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
+import mongoose from "mongoose"; // <--- NEW IMPORT (ID banane ke liye)
 
 /* CREATE */
 export const createPost = async (req, res) => {
@@ -67,6 +68,101 @@ export const likePost = async (req, res) => {
     );
 
     res.status(200).json(updatedPost);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
+/* COMMENT FEATURES */
+
+// 1. Post Comment (FIXED: Added _id and Logging)
+export const postComment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId, comment } = req.body;
+    
+    // Debugging Log: Check karo backend mein text aa raha hai ya nahi
+    console.log("BACKEND RECEIVED COMMENT:", { userId, commentText: comment });
+
+    const post = await Post.findById(id);
+    const user = await User.findById(userId);
+
+    // Naya Structure with Manual ID
+    const newComment = {
+      _id: new mongoose.Types.ObjectId(), // <--- ID GENERATE KI (Zaroori hai delete ke liye)
+      userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      userPicturePath: user.picturePath,
+      comment, 
+      likes: [] 
+    };
+
+    post.comments.push(newComment);
+
+    const updatedPost = await Post.findByIdAndUpdate(
+      id,
+      { comments: post.comments },
+      { new: true }
+    );
+
+    res.status(200).json(updatedPost);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
+// 2. Delete Comment
+export const deleteComment = async (req, res) => {
+  try {
+    const { id, commentId } = req.params;
+    const post = await Post.findById(id);
+
+    // Filter logic: Jo ID match kare usse hata do
+    post.comments = post.comments.filter((item) => String(item._id) !== commentId);
+
+    const updatedPost = await Post.findByIdAndUpdate(
+        id,
+        { comments: post.comments },
+        { new: true }
+    );
+    
+    res.status(200).json(updatedPost);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
+// 3. Edit Comment
+export const editComment = async (req, res) => {
+  try {
+    const { id, commentId } = req.params;
+    const { comment } = req.body;
+
+    // Debug Log
+    console.log(`Updating Comment - Post ID: ${id}, Comment ID: ${commentId}`);
+
+    const post = await Post.findById(id);
+
+    // Find the specific comment index
+    const commentIndex = post.comments.findIndex((item) => {
+      return item._id.toString() === commentId;
+    });
+
+    if (commentIndex > -1) {
+      // Update the comment text
+      post.comments[commentIndex].comment = comment;
+
+      // Notify Mongoose that the 'comments' array has been modified
+      post.markModified('comments');
+
+      await post.save();
+
+      const updatedPost = await Post.findById(id);
+      res.status(200).json(updatedPost);
+    } else {
+      res.status(404).json({ message: "Comment not found" });
+    }
   } catch (err) {
     res.status(404).json({ message: err.message });
   }

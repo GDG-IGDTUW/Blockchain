@@ -22,8 +22,9 @@ const postSchema = mongoose.Schema(
       type: Map,
       of: Boolean,
     },
+    // 👇 YEH IMPORTANT CHANGE HAI
     comments: {
-      type: Array,
+      type: Array, // Hum isse 'Array' bolenge taaki ye Object store kar sake
       default: [],
     },
   },

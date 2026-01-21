@@ -1,7 +1,7 @@
-import { Box, useMediaQuery } from "@mui/material";
+import { Box, Button, useMediaQuery } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "scenes/navbar";
 import FriendListWidget from "scenes/widgets/FriendListWidget";
 import MyPostWidget from "scenes/widgets/MyPostWidget";
@@ -13,6 +13,7 @@ const ProfilePage = () => {
   const { userId } = useParams();
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery("(min-width:1000px)");
+  const navigate = useNavigate();
 
   const getUser = async () => {
     const response = await fetch(`http://localhost:3001/users/${userId}`, {
@@ -41,9 +42,26 @@ const ProfilePage = () => {
       >
         <Box flexBasis={isNonMobileScreens ? "26%" : undefined}>
           <UserWidget userId={userId} picturePath={user.picturePath} />
+
+          {/* 
+            Button added to navigate to Profile Settings page.
+            This allows users to edit their profile details.
+          */}
+          <Button
+            variant="outlined"
+            fullWidth
+            sx={{ mt: "1rem" }}
+            onClick={() =>
+              navigate(`/profile/settings/${userId}`)
+            }
+          >
+            Edit Profile
+          </Button>
+
           <Box m="2rem 0" />
           <FriendListWidget userId={userId} />
         </Box>
+
         <Box
           flexBasis={isNonMobileScreens ? "42%" : undefined}
           mt={isNonMobileScreens ? undefined : "2rem"}

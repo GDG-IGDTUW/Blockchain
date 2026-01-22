@@ -22,9 +22,9 @@ const postSchema = mongoose.Schema(
       type: Map,
       of: Boolean,
     },
-    // 👇 YEH IMPORTANT CHANGE HAI
+    // 👇 FIX: Using simple Array type to avoid strict validation errors with Dates
     comments: {
-      type: Array, // Hum isse 'Array' bolenge taaki ye Object store kar sake
+      type: Array,
       default: [],
     },
   },

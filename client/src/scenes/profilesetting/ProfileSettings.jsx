@@ -25,14 +25,27 @@ const ProfileSettings = () => {
   const [loading, setLoading] = useState(false);
 
   // Fetch user data (same style as ProfilePage)
-  const getUser = async () => {
-    const response = await fetch(
-      `http://localhost:3001/users/${userId}`,
-      {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
+const getUser = async () => {
+  try {
+    const response = await fetch(`http://localhost:3001/users/${userId}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        alert("You are not logged in.");
+        return;
       }
-    );
+      
+      if (response.status === 403) {
+        alert("You do not have permission to view this profile.");
+        return;
+      }
+      alert("Could not load your profile settings.");
+      return;
+    }
+
     const data = await response.json();
 
     setForm({
@@ -40,7 +53,11 @@ const ProfileSettings = () => {
       email: data.email || "",
       bio: data.bio || "",
     });
-  };
+  } catch (err) {
+    alert("Network error while loading your profile settings.");
+  }
+};
+
 
   useEffect(() => {
     getUser();
@@ -64,37 +81,48 @@ const ProfileSettings = () => {
     return newErrors;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const validationErrors = validate();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
+  const validationErrors = validate();
+  if (Object.keys(validationErrors).length > 0) {
+    setErrors(validationErrors);
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const response = await fetch(`http://localhost:3001/users/${userId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(form),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        alert("You are not logged in.");
+        return;
+      }
+      if (response.status === 403) {
+        alert("You do not have permission to update this profile.");
+        return;
+      }
+      alert("Profile update failed.");
       return;
     }
 
-    try {
-      setLoading(true);
+    alert("Profile updated successfully!");
+  } catch (err) {
+    alert("Network error while saving changes.");
+  } finally {
+    setLoading(false);
+  }
+};
 
-      await fetch(
-        `http://localhost:3001/users/${userId}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(form),
-        }
-      );
-
-      alert("Profile updated successfully!");
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <Box>

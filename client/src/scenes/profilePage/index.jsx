@@ -16,13 +16,36 @@ const ProfilePage = () => {
   const navigate = useNavigate();
 
   const getUser = async () => {
+  try {
     const response = await fetch(`http://localhost:3001/users/${userId}`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
     });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        alert("You are not logged in. Please log in again.");
+        return;
+      }
+      if (response.status === 404) {
+        alert("User not found.");
+        return;
+      }
+      if (response.status === 403) {
+        alert("You do not have permission to view this profile.");
+        return;
+      }
+      alert("Could not load this profile. Please try again later.");
+      return;
+    }
+
     const data = await response.json();
     setUser(data);
-  };
+  } catch (err) {
+    alert("Network error while loading this profile. Please try again.");
+  }
+};
+
 
   useEffect(() => {
     getUser();

@@ -1,8 +1,8 @@
 import Post from "../models/Post.js";
 import User from "../models/User.js";
-import mongoose from "mongoose"; // <--- NEW IMPORT (ID banane ke liye)
+import mongoose from "mongoose";
 
-/* CREATE */
+/* CREATE POST */
 export const createPost = async (req, res) => {
   try {
     const { userId, description, picturePath } = req.body;
@@ -27,7 +27,7 @@ export const createPost = async (req, res) => {
   }
 };
 
-/* READ */
+/* READ POSTS */
 export const getFeedPosts = async (req, res) => {
   try {
     const post = await Post.find();
@@ -47,7 +47,7 @@ export const getUserPosts = async (req, res) => {
   }
 };
 
-/* UPDATE */
+/* UPDATE LIKES */
 export const likePost = async (req, res) => {
   try {
     const { id } = req.params;
@@ -73,28 +73,28 @@ export const likePost = async (req, res) => {
   }
 };
 
-/* COMMENT FEATURES */
+/* --- COMMENT FEATURES --- */
 
-// 1. Post Comment (FIXED: Added _id and Logging)
+// 1. Post Comment
 export const postComment = async (req, res) => {
   try {
     const { id } = req.params;
     const { userId, comment } = req.body;
     
-    // Debugging Log: Check karo backend mein text aa raha hai ya nahi
+    // Debug Log
     console.log("BACKEND RECEIVED COMMENT:", { userId, commentText: comment });
 
     const post = await Post.findById(id);
     const user = await User.findById(userId);
 
-    // Naya Structure with Manual ID
     const newComment = {
-      _id: new mongoose.Types.ObjectId(), // <--- ID GENERATE KI (Zaroori hai delete ke liye)
+      _id: new mongoose.Types.ObjectId(), // Generate ID manually
       userId,
       firstName: user.firstName,
       lastName: user.lastName,
       userPicturePath: user.picturePath,
       comment, 
+      createdAt: new Date().toISOString(), // Add Timestamp
       likes: [] 
     };
 
@@ -112,13 +112,13 @@ export const postComment = async (req, res) => {
   }
 };
 
-// 2. Delete Comment
+// 2. Delete Comment (YEH MISSING THA, ISLIYE ERROR AA RAHA THA)
 export const deleteComment = async (req, res) => {
   try {
     const { id, commentId } = req.params;
     const post = await Post.findById(id);
 
-    // Filter logic: Jo ID match kare usse hata do
+    // Filter out the comment by ID
     post.comments = post.comments.filter((item) => String(item._id) !== commentId);
 
     const updatedPost = await Post.findByIdAndUpdate(
@@ -139,7 +139,6 @@ export const editComment = async (req, res) => {
     const { id, commentId } = req.params;
     const { comment } = req.body;
 
-    // Debug Log
     console.log(`Updating Comment - Post ID: ${id}, Comment ID: ${commentId}`);
 
     const post = await Post.findById(id);
@@ -150,11 +149,10 @@ export const editComment = async (req, res) => {
     });
 
     if (commentIndex > -1) {
-      // Update the comment text
-      post.comments[commentIndex].comment = comment;
-
-      // Notify Mongoose that the 'comments' array has been modified
-      post.markModified('comments');
+      post.comments[commentIndex].comment = comment; // Update Text
+      
+      // Mark as modified so Mongoose knows to save the array change
+      post.markModified('comments'); 
 
       await post.save();
 

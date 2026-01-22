@@ -1,16 +1,14 @@
-import { Box, Typography, useTheme, IconButton, Divider, InputBase, Button } from "@mui/material";
-import { DeleteOutline, EditOutlined, Save, Cancel } from "@mui/icons-material";
-import FlexBetween from "./FlexBetween";
+import { Box, InputBase, Button, useTheme, Divider } from "@mui/material";
 import UserImage from "./UserImage";
+import FlexBetween from "./FlexBetween";
+import CommentItem from "./CommentItem"; // Import the new reusable component
 import { useSelector, useDispatch } from "react-redux";
 import { setPost } from "state";
 import { useState } from "react";
 
 const Comments = ({ postId, comments }) => {
   const [text, setText] = useState(""); // State for new comment input
-  const [editingCommentId, setEditingCommentId] = useState(null); // Which comment is currently being edited?
-  const [editRequestText, setEditRequestText] = useState(""); // Text state for the comment being edited
-
+  
   const { palette } = useTheme();
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
@@ -18,53 +16,55 @@ const Comments = ({ postId, comments }) => {
 
   // 1. ADD COMMENT FUNCTION
   const handleAddComment = async () => {
-    const response = await fetch(`http://localhost:3001/posts/${postId}/comment`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId: user._id, comment: text }),
-    });
-    const updatedPost = await response.json();
-    dispatch(setPost({ post: updatedPost }));
-    setText(""); // Clear the input field
-  };
-
-  // 2. DELETE COMMENT FUNCTION
-  const handleDeleteComment = async (commentId) => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${postId}/${commentId}/delete`,
-      {
-        method: "DELETE",
+    try {
+      const response = await fetch(`http://localhost:3001/posts/${postId}/comment`, {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-      }
-    );
-    const updatedPost = await response.json();
-    dispatch(setPost({ post: updatedPost }));
+        body: JSON.stringify({ userId: user._id, comment: text }),
+      });
+      const updatedPost = await response.json();
+      dispatch(setPost({ post: updatedPost }));
+      setText(""); // Clear the input field
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
   };
 
-  // 3. START EDITING (Triggered when Edit icon is clicked)
-  const startEditing = (commentId, currentText) => {
-    setEditingCommentId(commentId);
-    setEditRequestText(currentText);
-  };
-
-  // 4. SAVE EDIT (Updated with Safety Checks)
-  const handleSaveEdit = async () => {
+  // 2. DELETE COMMENT FUNCTION
+  const handleDeleteComment = async (commentId) => {
     try {
       const response = await fetch(
-        `http://localhost:3001/posts/${postId}/${editingCommentId}/edit`,
+        `http://localhost:3001/posts/${postId}/${commentId}/delete`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const updatedPost = await response.json();
+      dispatch(setPost({ post: updatedPost }));
+    } catch (error) {
+      console.error("Error deleting comment:", error);
+    }
+  };
+
+  // 3. EDIT COMMENT FUNCTION (Receives ID and Text from Child)
+  const handleEditComment = async (commentId, newText) => {
+    try {
+      const response = await fetch(
+        `http://localhost:3001/posts/${postId}/${commentId}/edit`,
         {
           method: "PATCH",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ comment: editRequestText }),
+          body: JSON.stringify({ comment: newText }),
         }
       );
 
@@ -74,7 +74,6 @@ const Comments = ({ postId, comments }) => {
 
       const updatedPost = await response.json();
       dispatch(setPost({ post: updatedPost }));
-      setEditingCommentId(null); // Exit edit mode
       console.log("Comment updated successfully!");
     } catch (error) {
       console.error("Error saving edit:", error);
@@ -112,66 +111,17 @@ const Comments = ({ postId, comments }) => {
       </FlexBetween>
 
       {/* COMMENTS LIST */}
-      {comments.map((c, i) => (
-        <Box key={`${c.userId}-${i}`}>
-          <Divider />
-          <FlexBetween sx={{ m: "0.5rem 0" }}>
-            <Box display="flex" gap="1rem" width="100%">
-              <UserImage image={c.userPicturePath} size="35px" />
-              
-              <Box width="100%">
-                <Typography variant="h6" sx={{ color: palette.neutral.main }}>
-                  {c.firstName} {c.lastName}
-                </Typography>
-
-                {/* LOGIC: If this comment is in EDIT mode, show Input field; otherwise show Text */}
-                {editingCommentId === c._id ? (
-                  <FlexBetween gap="1rem">
-                    <InputBase
-                        value={editRequestText}
-                        onChange={(e) => setEditRequestText(e.target.value)}
-                        sx={{
-                            backgroundColor: palette.neutral.light,
-                            borderRadius: "1rem",
-                            padding: "0.2rem 1rem",
-                            width: "100%",
-                            mt: "0.5rem"
-                        }}
-                    />
-                    {/* SAVE & CANCEL Buttons */}
-                    <Box display="flex">
-                        <IconButton onClick={handleSaveEdit}>
-                            <Save sx={{ color: palette.primary.main }} />
-                        </IconButton>
-                        <IconButton onClick={() => setEditingCommentId(null)}>
-                            <Cancel sx={{ color: palette.error.main }} />
-                        </IconButton>
-                    </Box>
-                  </FlexBetween>
-                ) : (
-                  <Typography sx={{ color: palette.neutral.medium, m: "0.5rem 0" }}>
-                    {c.comment}
-                  </Typography>
-                )}
-              </Box>
-            </Box>
-
-            {/* ACTION BUTTONS (Edit/Delete) - Only visible for the user's own comments */}
-            {c.userId === user._id && editingCommentId !== c._id && (
-              <Box display="flex">
-                 {/* EDIT BUTTON */}
-                <IconButton onClick={() => startEditing(c._id, c.comment)}>
-                    <EditOutlined sx={{ color: palette.neutral.medium }} />
-                </IconButton>
-                {/* DELETE BUTTON */}
-                <IconButton onClick={() => handleDeleteComment(c._id)}>
-                    <DeleteOutline sx={{ color: palette.neutral.medium }} />
-                </IconButton>
-              </Box>
-            )}
-          </FlexBetween>
-        </Box>
-      ))}
+      <Box>
+        {comments.map((comment, i) => (
+          <CommentItem
+            key={`${comment.userId}-${i}`} // Use a unique key
+            comment={comment}
+            loggedInUserId={user._id}
+            onDelete={handleDeleteComment}
+            onEdit={handleEditComment}
+          />
+        ))}
+      </Box>
       <Divider />
     </Box>
   );

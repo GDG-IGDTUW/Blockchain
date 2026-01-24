@@ -9,16 +9,17 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
   const main = palette.neutral.main;
   const medium = palette.neutral.medium;
 
+  // Local state for editing mode
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(comment.comment);
   
-  // Local state for Like UI
+  // Local state for Like UI (Visual only)
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
 
-  // --- TIME AGO LOGIC ---
+  // --- HELPER: Calculate Relative Time ---
   const formatTimeAgo = (dateString) => {
-    if (!dateString) return "Just now"; // Fallback if date is missing
+    if (!dateString) return "Just now";
     
     const date = new Date(dateString);
     const now = new Date();
@@ -51,12 +52,12 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
   };
 
   const handleSave = () => {
-    onEdit(comment._id, editText);
+    onEdit(comment._id, editText); // Trigger parent update
     setIsEditing(false);
   };
 
   const handleCancel = () => {
-    setEditText(comment.comment);
+    setEditText(comment.comment); // Reset text
     setIsEditing(false);
   };
 
@@ -69,19 +70,18 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
           <UserImage image={comment.userPicturePath} size="35px" />
 
           <Box width="100%">
-            {/* Author Name and Time */}
+            {/* Author Name & Timestamp */}
             <Box display="flex" alignItems="center" gap="0.5rem">
                 <Typography variant="h6" sx={{ color: main }}>
                   {comment.firstName} {comment.lastName}
                 </Typography>
                 
-                {/* DATE DISPLAY */}
                 <Typography variant="caption" sx={{ color: medium }}>
                     {formatTimeAgo(comment.createdAt)}
                 </Typography>
             </Box>
 
-            {/* EDIT MODE */}
+            {/* Comment Text or Edit Input */}
             {isEditing ? (
               <FlexBetween gap="1rem">
                 <InputBase
@@ -106,7 +106,6 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
                 </Box>
               </FlexBetween>
             ) : (
-              /* VIEW MODE */
               <Typography sx={{ color: medium, m: "0.5rem 0" }}>
                 {comment.comment}
               </Typography>
@@ -114,7 +113,7 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
           </Box>
         </Box>
 
-        {/* ACTIONS (Like, Edit, Delete) */}
+        {/* Actions (Like, Edit, Delete) */}
         <Box display="flex" flexDirection="column" alignItems="center">
             <IconButton onClick={handleLike} size="small">
                 {isLiked ? (
@@ -124,6 +123,7 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
                 )}
             </IconButton>
             
+            {/* Edit/Delete Buttons (Only for Owner) */}
             {comment.userId === loggedInUserId && !isEditing && (
                 <Box display="flex" mt="0.2rem">
                 <IconButton onClick={() => setIsEditing(true)} size="small">

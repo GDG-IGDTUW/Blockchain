@@ -66,4 +66,7 @@ mongoose
     // User.insertMany(users);
     // Post.insertMany(posts);
   })
-  .catch((error) => console.log(`${error} did not connect`));
+  .catch((error) =>
+  console.log(`Failed to connect to MongoDB. Check MONGO_URL and database availability. Error: ${error.message}`)
+);
+

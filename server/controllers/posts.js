@@ -23,7 +23,7 @@ export const createPost = async (req, res) => {
     const post = await Post.find();
     res.status(201).json(post);
   } catch (err) {
-    res.status(409).json({ message: err.message });
+    res.status(500).json({ msg: "Post could not be created. Please check your input and try again." });
   }
 };
 
@@ -33,7 +33,7 @@ export const getFeedPosts = async (req, res) => {
     const post = await Post.find();
     res.status(200).json(post);
   } catch (err) {
-    res.status(404).json({ message: err.message });
+    res.status(500).json({  msg: "Could not load feed posts." });
   }
 };
 
@@ -43,7 +43,7 @@ export const getUserPosts = async (req, res) => {
     const post = await Post.find({ userId });
     res.status(200).json(post);
   } catch (err) {
-    res.status(404).json({ message: err.message });
+    res.status(500).json({  msg: "Could not load this user's posts." });
   }
 };
 
@@ -69,7 +69,7 @@ export const likePost = async (req, res) => {
 
     res.status(200).json(updatedPost);
   } catch (err) {
-    res.status(404).json({ message: err.message });
+    res.status(500).json({  msg: "Could not update post like status." });
   }
 };
 

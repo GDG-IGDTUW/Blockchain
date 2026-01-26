@@ -30,6 +30,30 @@ export const getUserFriends = async (req, res) => {
   }
 };
 
+/* SEARCH USER */
+export const getUserBySearch = async (req, res) => {
+  try {
+    const { query } = req.params;
+    
+    // If the query is empty, return an empty array
+    if (!query) return res.status(200).json([]);
+
+    // Search for users where firstName OR lastName matches the query
+    // $regex: query -> matches partial strings
+    // $options: "i" -> makes it Case Insensitive (e.g., "Vivek" matches "vivek")
+    const users = await User.find({
+      $or: [
+        { firstName: { $regex: query, $options: "i" } },
+        { lastName: { $regex: query, $options: "i" } },
+      ],
+    });
+
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(404).json({ message: err.message });
+  }
+};
+
 /* UPDATE */
 export const addRemoveFriend = async (req, res) => {
   try {

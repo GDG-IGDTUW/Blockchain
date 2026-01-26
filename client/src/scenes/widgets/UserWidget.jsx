@@ -18,6 +18,11 @@ const UserWidget = ({ userId, picturePath }) => {
   const { palette } = useTheme();
   const navigate = useNavigate();
   const token = useSelector((state) => state.token);
+  
+  // 1. GLOBAL STATE SE DATA LO (Live Updates ke liye)
+  const loggedInUserId = useSelector((state) => state.user._id);
+  const globalFriends = useSelector((state) => state.user.friends);
+
   const dark = palette.neutral.dark;
   const medium = palette.neutral.medium;
   const main = palette.neutral.main;
@@ -46,8 +51,15 @@ const UserWidget = ({ userId, picturePath }) => {
     occupation,
     viewedProfile,
     impressions,
-    friends,
+    friends, // Ye API wala data hai (Old)
   } = user;
+
+  // 2. SMART COUNT LOGIC
+  // Agar ye meri profile hai -> Global Redux State (Live) use karo
+  // Agar kisi aur ki profile hai -> API Data (user.friends) use karo
+  const friendsCount = (userId === loggedInUserId)
+  ? (globalFriends?.length || 0)
+  : (friends?.length || 0);
 
   return (
     <WidgetWrapper>
@@ -73,11 +85,13 @@ const UserWidget = ({ userId, picturePath }) => {
             >
               {firstName} {lastName}
             </Typography>
-
             {/* Wallet Address UI */}
             {user.walletAddress && <ShortWallet address={user.walletAddress} />}
 
-            <Typography color={medium}>{friends.length} friends</Typography>
+            <Typography color={medium}>
+              {friendsCount} friends
+            </Typography>
+
           </Box>
         </FlexBetween>
         <ManageAccountsOutlined />

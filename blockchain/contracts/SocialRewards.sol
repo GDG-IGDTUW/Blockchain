@@ -36,8 +36,17 @@ contract SocialRewards {
     function registerUser(address user) external onlyOwner {
         require(!hasRegistered[user], "User already registered");
         require(balanceOf[owner] >= REGISTRATION_REWARD, "Insufficient balance for reward");
-        
+
+         // GAS HEAVY: SSTORE (Storage Write)
+        // Setting a value from 0 to non-zero (initializing) costs 20,000 gas.
+        // This is the most expensive operation in this transaction.   
         hasRegistered[user] = true;
+
+        // GAS HEAVY: Multiple SSTOREs
+        // We are updating two separate storage slots here.
+        // 1. Read owner balance (SLOAD) -> Modify -> Write back (SSTORE)
+        // 2. Read user balance (SLOAD) -> Modify -> Write back (SSTORE)
+
         balanceOf[owner] -= REGISTRATION_REWARD;
         balanceOf[user] += REGISTRATION_REWARD;
         
@@ -47,7 +56,7 @@ contract SocialRewards {
     
     function recordPost(address user) external onlyOwner {
         require(hasRegistered[user], "User not registered");
-        
+        //Gas Heavy- increment in the storage (Read-Modify-Write Cycle)
         postCount[user]++;
         
         // Check if user has completed 10 posts since last reward
@@ -58,10 +67,14 @@ contract SocialRewards {
             uint256 rewardAmount = rewardsEarned * POST_REWARD;
             
             require(balanceOf[owner] >= rewardAmount, "Insufficient balance for reward");
-            
+            //Gas Heavy- storage update for balance triggers 2 more SSTORE operations.  
             balanceOf[owner] -= rewardAmount;
             balanceOf[user] += rewardAmount;
-            
+
+            // GAS HEAVY: Writing to a separate storage slot
+            // `postCount` and `lastRewardedPostCount` are in different slots.
+            // Writing to this separate slot incurs another SSTORE cost.
+
             lastRewardedPostCount[user] = postCount[user] - (postsForReward % POSTS_REQUIRED);
             
             emit Transfer(owner, user, rewardAmount);

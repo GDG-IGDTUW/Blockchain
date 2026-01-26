@@ -112,7 +112,7 @@ export const postComment = async (req, res) => {
   }
 };
 
-// 2. Delete Comment (YEH MISSING THA, ISLIYE ERROR AA RAHA THA)
+// 2. Delete Comment
 export const deleteComment = async (req, res) => {
   try {
     const { id, commentId } = req.params;

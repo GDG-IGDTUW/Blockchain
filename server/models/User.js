@@ -29,6 +29,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    walletAddress: {
+     type: String,
+     default: "",
+    },
     friends: {
       type: Array,
       default: [],

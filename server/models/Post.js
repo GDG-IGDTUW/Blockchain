@@ -3,8 +3,9 @@ import mongoose from "mongoose";
 const postSchema = mongoose.Schema(
   {
     userId: {
-      type: String,
-      required: true,
+        type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  required: true,
     },
     firstName: {
       type: String,
@@ -30,6 +31,8 @@ const postSchema = mongoose.Schema(
   },
   { timestamps: true }
 );
+
+postSchema.index({ description: "text"  });
 
 const Post = mongoose.model("Post", postSchema);
 

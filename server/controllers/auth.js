@@ -10,12 +10,11 @@ export const register = async (req, res) => {
       lastName,
       email,
       password,
-      picturePath,
       friends,
       location,
       occupation,
     } = req.body;
-
+ const picturePath = req.file ? req.file.filename : "";
     const salt = await bcrypt.genSalt();
     const passwordHash = await bcrypt.hash(password, salt);
 
@@ -34,8 +33,9 @@ export const register = async (req, res) => {
     const savedUser = await newUser.save();
     res.status(201).json(savedUser);
   } catch (err) {
-    res.status(500).json({ msg: "Registration failed." });
-  }
+  console.error("REGISTER ERROR:", err);
+  res.status(500).json({ msg: "Registration failed", error: err.message });
+}
 };
 
 /* LOGGING IN */

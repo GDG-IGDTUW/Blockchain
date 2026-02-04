@@ -34,7 +34,7 @@ import FlexBetween from "components/FlexBetween";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
-  
+
   // --- SEARCH STATES ---
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -62,25 +62,25 @@ const Navbar = () => {
   // --- FINAL SEARCH FUNCTION ---
   const handleSearch = async (query) => {
     setSearchQuery(query);
-    
+
     // If input is empty, clear results and return
-    if (!query || query === "") {
-        setSearchResults([]);
-        return;
+    if (!query || query.trim() === "") {
+      setSearchResults([]);
+      return;
     }
 
     try {
-        const response = await fetch(`http://localhost:3001/users/search/${query}`, {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
+     const res = await fetch(
+  `http://localhost:3001/search/all?q=${query}`
+);
+const data = await res.json();
 
-        if (response.ok) {
-            const data = await response.json();
-            setSearchResults(data);
-        } 
-    } catch (error) {
-        console.error("Search failed:", error);
+setSearchResults([
+  ...data.users.map(u => ({ ...u, type: "user" })),
+  ...data.posts.map(p => ({ ...p, type: "post" })),
+]);
+    } catch (err) {
+      console.error(err);
     }
   };
   const connectWallet = async () => {
@@ -123,15 +123,15 @@ const Navbar = () => {
 
         {/* --- SEARCH BAR SECTION --- */}
         {isNonMobileScreens && (
-          <Box position="relative"> 
+          <Box position="relative">
             <FlexBetween
               backgroundColor={neutralLight}
               borderRadius="9px"
               gap="3rem"
               padding="0.1rem 1.5rem"
             >
-              <InputBase 
-                placeholder="Search users..." 
+              <InputBase
+                placeholder="Search users..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
               />
@@ -155,22 +155,26 @@ const Navbar = () => {
                 overflow="auto"
               >
                 <List dense>
-                  {searchResults.map((resultUser) => (
-                    <ListItem 
-                      key={resultUser._id} 
-                      button 
+                  {searchResults.map((item) => (
+                    <ListItem
+                      key={item._id}
+                      button
                       onClick={() => {
-                        navigate(`/profile/${resultUser._id}`);
-                        navigate(0); // Refresh page to load profile
-                        setSearchResults([]); // Close dropdown
-                        setSearchQuery(""); // Clear search
-                      }}
-                      sx={{ "&:hover": { backgroundColor: background } }}
+  navigate(
+    item.type === "user"
+      ? `/profile/${item._id}`
+      : `/post/${item._id}`
+  );
+}}
                     >
-                      <ListItemText 
-                        primary={`${resultUser.firstName} ${resultUser.lastName}`} 
-                        sx={{ ml: 1, color: theme.palette.neutral.main }} 
-                      />
+                     <ListItemText
+  primary={
+    item.type === "user"
+      ? `${item.firstName} ${item.lastName}`
+      : item.description
+  }
+  secondary={item.type === "user" ? "User" : "Post"}
+/>
                     </ListItem>
                   ))}
                 </List>

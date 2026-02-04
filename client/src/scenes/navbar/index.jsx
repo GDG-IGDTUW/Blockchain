@@ -1,4 +1,8 @@
 import { useState } from "react";
+
+import { ethers } from "ethers";
+import Loader from "components/Loader";
+
 import {
   Box,
   IconButton,
@@ -35,6 +39,11 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   
+
+  // --- WALLET STATES ---
+  const [walletAddress, setWalletAddress] = useState(null);
+  const [walletLoading, setWalletLoading] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
@@ -74,6 +83,25 @@ const Navbar = () => {
         console.error("Search failed:", error);
     }
   };
+  const connectWallet = async () => {
+  if (!window.ethereum) {
+    alert("MetaMask not detected. Please install MetaMask.");
+    return;
+  }
+
+  try {
+    setWalletLoading(true);
+
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const accounts = await provider.send("eth_requestAccounts", []);
+
+    setWalletAddress(accounts[0]);
+  } catch (error) {
+    console.error("Wallet connection failed:", error);
+  } finally {
+    setWalletLoading(false);
+  }
+};
 
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt} position="relative">
@@ -155,6 +183,24 @@ const Navbar = () => {
       {/* DESKTOP NAV */}
       {isNonMobileScreens ? (
         <FlexBetween gap="2rem">
+          {walletLoading ? (
+  <Loader />
+) : (
+  <Typography
+    onClick={!walletLoading ? connectWallet : undefined}
+    sx={{
+      cursor: "pointer",
+      color: "primary.main",
+      fontWeight: 500,
+      "&:hover": { opacity: 0.8 },
+    }}
+  >
+    {walletAddress
+      ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+      : "Connect Wallet"}
+  </Typography>
+)}
+
           <IconButton onClick={() => dispatch(setMode())}>
             {theme.palette.mode === "dark" ? (
               <DarkMode sx={{ fontSize: "25px" }} />
@@ -227,6 +273,23 @@ const Navbar = () => {
             alignItems="center"
             gap="3rem"
           >
+            {walletLoading ? (
+  <Loader />
+) : (
+  <Typography
+    onClick={!walletLoading ? connectWallet : undefined}
+    sx={{
+      cursor: "pointer",
+      color: "primary.main",
+      fontWeight: 500,
+    }}
+  >
+    {walletAddress
+      ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+      : "Connect Wallet"}
+  </Typography>
+)}
+
             <IconButton
               onClick={() => dispatch(setMode())}
               sx={{ fontSize: "25px" }}

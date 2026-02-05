@@ -9,6 +9,7 @@ import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
 import ProfileSettings from "scenes/profilesetting/ProfileSettings";
 import PostPage from "scenes/postPage";
+import NotFoundPage from 'scenes/notFoundPage';
 
 function App() {
   const mode = useSelector((state) => state.mode);
@@ -37,6 +38,10 @@ function App() {
             <Route
               path="/profile/settings/:userId"
               element={isAuth ? <ProfileSettings /> : <Navigate to="/" />}
+            />
+            <Route
+              path="*"
+              element={<NotFoundPage />}
             />
           </Routes>
         </ThemeProvider>

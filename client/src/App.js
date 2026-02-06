@@ -9,6 +9,7 @@ import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
 import ProfileSettings from "scenes/profilesetting/ProfileSettings";
 import PostPage from "scenes/postPage";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const mode = useSelector((state) => state.mode);
@@ -21,6 +22,7 @@ function App() {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Routes>
+            <Route path="*" element={<NotFound />} />
             <Route path="/" element={<LoginPage />} />
             <Route
               path="/home"

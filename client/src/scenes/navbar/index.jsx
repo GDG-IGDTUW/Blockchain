@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Box,
   IconButton,
@@ -12,7 +12,7 @@ import {
   List,
   ListItem,
   ListItemText,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Search,
   Message,
@@ -22,24 +22,24 @@ import {
   Help,
   Menu,
   Close,
-} from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
-import { setMode, setLogout } from "state";
-import { useNavigate } from "react-router-dom";
-import FlexBetween from "components/FlexBetween";
+} from '@mui/icons-material';
+import { useDispatch, useSelector } from 'react-redux';
+import { setMode, setLogout } from 'state';
+import { useNavigate } from 'react-router-dom';
+import FlexBetween from 'components/FlexBetween';
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
 
   // --- SEARCH STATES ---
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
   const token = useSelector((state) => state.token);
-  const isNonMobileScreens = useMediaQuery("(min-width: 1000px)");
+  const isNonMobileScreens = useMediaQuery('(min-width: 1000px)');
 
   const theme = useTheme();
   const neutralLight = theme.palette.neutral.light;
@@ -48,28 +48,26 @@ const Navbar = () => {
   const primaryLight = theme.palette.primary.light;
   const alt = theme.palette.background.alt;
 
-  const fullName = user ? `${user.firstName} ${user.lastName}` : "User";
+  const fullName = user ? `${user.firstName} ${user.lastName}` : 'User';
 
   // --- FINAL SEARCH FUNCTION ---
   const handleSearch = async (query) => {
     setSearchQuery(query);
 
     // If input is empty, clear results and return
-    if (!query || query.trim() === "") {
+    if (!query || query.trim() === '') {
       setSearchResults([]);
       return;
     }
 
     try {
-     const res = await fetch(
-  `http://localhost:3001/search/all?q=${query}`
-);
-const data = await res.json();
+      const res = await fetch(`http://localhost:3001/search/all?q=${query}`);
+      const data = await res.json();
 
-setSearchResults([
-  ...data.users.map(u => ({ ...u, type: "user" })),
-  ...data.posts.map(p => ({ ...p, type: "post" })),
-]);
+      setSearchResults([
+        ...data.users.map((u) => ({ ...u, type: 'user' })),
+        ...data.posts.map((p) => ({ ...p, type: 'post' })),
+      ]);
     } catch (err) {
       console.error(err);
     }
@@ -82,11 +80,11 @@ setSearchResults([
           fontWeight="bold"
           fontSize="clamp(1rem, 2rem, 2.25rem)"
           color="primary"
-          onClick={() => navigate("/home")}
+          onClick={() => navigate('/home')}
           sx={{
-            "&:hover": {
+            '&:hover': {
               color: primaryLight,
-              cursor: "pointer",
+              cursor: 'pointer',
             },
           }}
         >
@@ -132,21 +130,21 @@ setSearchResults([
                       key={item._id}
                       button
                       onClick={() => {
-  navigate(
-    item.type === "user"
-      ? `/profile/${item._id}`
-      : `/post/${item._id}`
-  );
-}}
+                        navigate(
+                          item.type === 'user'
+                            ? `/profile/${item._id}`
+                            : `/post/${item._id}`
+                        );
+                      }}
                     >
-                     <ListItemText
-  primary={
-    item.type === "user"
-      ? `${item.firstName} ${item.lastName}`
-      : item.description
-  }
-  secondary={item.type === "user" ? "User" : "Post"}
-/>
+                      <ListItemText
+                        primary={
+                          item.type === 'user'
+                            ? `${item.firstName} ${item.lastName}`
+                            : item.description
+                        }
+                        secondary={item.type === 'user' ? 'User' : 'Post'}
+                      />
                     </ListItem>
                   ))}
                 </List>
@@ -160,28 +158,28 @@ setSearchResults([
       {isNonMobileScreens ? (
         <FlexBetween gap="2rem">
           <IconButton onClick={() => dispatch(setMode())}>
-            {theme.palette.mode === "dark" ? (
-              <DarkMode sx={{ fontSize: "25px" }} />
+            {theme.palette.mode === 'dark' ? (
+              <DarkMode sx={{ fontSize: '25px' }} />
             ) : (
-              <LightMode sx={{ color: dark, fontSize: "25px" }} />
+              <LightMode sx={{ color: dark, fontSize: '25px' }} />
             )}
           </IconButton>
-          <Message sx={{ fontSize: "25px" }} />
-          <Notifications sx={{ fontSize: "25px" }} />
-          <Help sx={{ fontSize: "25px" }} />
+          <Message sx={{ fontSize: '25px' }} />
+          <Notifications sx={{ fontSize: '25px' }} />
+          <Help sx={{ fontSize: '25px' }} />
           <FormControl variant="standard" value={fullName}>
             <Select
               value={fullName}
               sx={{
                 backgroundColor: neutralLight,
-                width: "150px",
-                borderRadius: "0.25rem",
-                p: "0.25rem 1rem",
-                "& .MuiSvgIcon-root": {
-                  pr: "0.25rem",
-                  width: "3rem",
+                width: '150px',
+                borderRadius: '0.25rem',
+                p: '0.25rem 1rem',
+                '& .MuiSvgIcon-root': {
+                  pr: '0.25rem',
+                  width: '3rem',
                 },
-                "& .MuiSelect-select:focus": {
+                '& .MuiSelect-select:focus': {
                   backgroundColor: neutralLight,
                 },
               }}
@@ -233,30 +231,30 @@ setSearchResults([
           >
             <IconButton
               onClick={() => dispatch(setMode())}
-              sx={{ fontSize: "25px" }}
+              sx={{ fontSize: '25px' }}
             >
-              {theme.palette.mode === "dark" ? (
-                <DarkMode sx={{ fontSize: "25px" }} />
+              {theme.palette.mode === 'dark' ? (
+                <DarkMode sx={{ fontSize: '25px' }} />
               ) : (
-                <LightMode sx={{ color: dark, fontSize: "25px" }} />
+                <LightMode sx={{ color: dark, fontSize: '25px' }} />
               )}
             </IconButton>
-            <Message sx={{ fontSize: "25px" }} />
-            <Notifications sx={{ fontSize: "25px" }} />
-            <Help sx={{ fontSize: "25px" }} />
+            <Message sx={{ fontSize: '25px' }} />
+            <Notifications sx={{ fontSize: '25px' }} />
+            <Help sx={{ fontSize: '25px' }} />
             <FormControl variant="standard" value={fullName}>
               <Select
                 value={fullName}
                 sx={{
                   backgroundColor: neutralLight,
-                  width: "150px",
-                  borderRadius: "0.25rem",
-                  p: "0.25rem 1rem",
-                  "& .MuiSvgIcon-root": {
-                    pr: "0.25rem",
-                    width: "3rem",
+                  width: '150px',
+                  borderRadius: '0.25rem',
+                  p: '0.25rem 1rem',
+                  '& .MuiSvgIcon-root': {
+                    pr: '0.25rem',
+                    width: '3rem',
                   },
-                  "& .MuiSelect-select:focus": {
+                  '& .MuiSelect-select:focus': {
                     backgroundColor: neutralLight,
                   },
                 }}

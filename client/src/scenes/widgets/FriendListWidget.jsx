@@ -1,9 +1,9 @@
-import { Box, Typography, useTheme } from "@mui/material";
-import Friend from "components/Friend";
-import WidgetWrapper from "components/WidgetWrapper";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setFriends } from "state";
+import { Box, Typography, useTheme } from '@mui/material';
+import Friend from 'components/Friend';
+import WidgetWrapper from 'components/WidgetWrapper';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setFriends } from 'state';
 
 const FriendListWidget = ({ userId }) => {
   const dispatch = useDispatch();
@@ -15,7 +15,7 @@ const FriendListWidget = ({ userId }) => {
     const response = await fetch(
       `http://localhost:3001/users/${userId}/friends`,
       {
-        method: "GET",
+        method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       }
     );
@@ -33,7 +33,7 @@ const FriendListWidget = ({ userId }) => {
         color={palette.neutral.dark}
         variant="h5"
         fontWeight="500"
-        sx={{ mb: "1.5rem" }}
+        sx={{ mb: '1.5rem' }}
       >
         Friend List
       </Typography>

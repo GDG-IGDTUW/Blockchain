@@ -3,15 +3,15 @@ import {
   FavoriteBorderOutlined,
   FavoriteOutlined,
   ShareOutlined,
-} from "@mui/icons-material";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
-import FlexBetween from "components/FlexBetween";
-import Friend from "components/Friend";
-import WidgetWrapper from "components/WidgetWrapper";
-import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setPost } from "state";
-import Comments from "components/Comments";
+} from '@mui/icons-material';
+import { Box, IconButton, Typography, useTheme } from '@mui/material';
+import FlexBetween from 'components/FlexBetween';
+import Friend from 'components/Friend';
+import WidgetWrapper from 'components/WidgetWrapper';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setPost } from 'state';
+import Comments from 'components/Comments';
 
 const PostWidget = ({
   postId,
@@ -28,7 +28,7 @@ const PostWidget = ({
   const dispatch = useDispatch();
   const token = useSelector((state) => state.token);
   const loggedInUserId = useSelector((state) => state.user._id);
-  
+
   // SAFE CHECK (Crash Proof)
   const isLiked = Boolean(likes?.[loggedInUserId]);
   const likeCount = likes ? Object.keys(likes).length : 0;
@@ -39,10 +39,10 @@ const PostWidget = ({
 
   const patchLike = async () => {
     const response = await fetch(`http://localhost:3001/posts/${postId}/like`, {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({ userId: loggedInUserId }),
     });
@@ -58,7 +58,7 @@ const PostWidget = ({
         subtitle={location}
         userPicturePath={userPicturePath}
       />
-      <Typography color={main} sx={{ mt: "1rem" }}>
+      <Typography color={main} sx={{ mt: '1rem' }}>
         {description}
       </Typography>
       {picturePath && (
@@ -66,7 +66,7 @@ const PostWidget = ({
           width="100%"
           height="auto"
           alt="post"
-          style={{ borderRadius: "0.75rem", marginTop: "0.75rem" }}
+          style={{ borderRadius: '0.75rem', marginTop: '0.75rem' }}
           src={`http://localhost:3001/assets/${picturePath}`}
         />
       )}
@@ -95,11 +95,8 @@ const PostWidget = ({
           <ShareOutlined />
         </IconButton>
       </FlexBetween>
-      
-      {isComments && (
-        <Comments postId={postId} comments={comments || []} />
-      )}
-      
+
+      {isComments && <Comments postId={postId} comments={comments || []} />}
     </WidgetWrapper>
   );
 };

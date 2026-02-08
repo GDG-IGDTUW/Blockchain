@@ -16,13 +16,13 @@ export const register = async (req, res) => {
     } = req.body;
     const picturePath = req.file ? req.file.filename : '';
     const salt = await bcrypt.genSalt();
-    const passwordHash = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
       firstName,
       lastName,
       email,
-      password: passwordHash,
+      password: hashedPassword  ,
       picturePath,
       friends,
       location,
@@ -46,8 +46,8 @@ export const login = async (req, res) => {
     if (!user)
       return res.status(401).json({ msg: 'Invalid email or password.' });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch)
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect)
       return res.status(401).json({ msg: 'Invalid email or password.' });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);

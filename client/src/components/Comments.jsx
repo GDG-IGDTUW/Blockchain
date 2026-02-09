@@ -84,37 +84,54 @@ const Comments = ({ postId, comments }) => {
   };
 
   return (
-    <Box mt="0.5rem">
+    <Box mt="0.75rem">
       {/* ADD NEW COMMENT INPUT SECTION */}
-      <FlexBetween gap="1rem" sx={{ mb: '1rem' }}>
-        <UserImage image={user.picturePath} size="35px" />
+          <Box
+      sx={{
+        backgroundColor: palette.background.alt,
+        borderRadius: '0.75rem',
+        p: '0.75rem',
+        mb: '1rem',
+      }}
+    >
+      <FlexBetween gap="0.75rem">
+        <UserImage image={user.picturePath} size="38px" />
         <InputBase
           placeholder="Write a comment..."
           onChange={(e) => setText(e.target.value)}
           value={text}
+          fullWidth
           sx={{
-            width: '100%',
             backgroundColor: palette.neutral.light,
-            borderRadius: '2rem',
-            padding: '0.5rem 1rem',
+            borderRadius: '0.75rem',
+            px: '0.75rem',
+            py: '0.5rem',
+            fontSize: '0.875rem',
           }}
         />
         <Button
           disabled={!text}
           onClick={handleAddComment}
           sx={{
-            color: palette.background.alt,
+            minWidth: '70px',
+            height: '36px',
+            borderRadius: '0.75rem',
             backgroundColor: palette.primary.main,
-            borderRadius: '3rem',
-            '&:hover': { color: palette.primary.main },
+            color: '#fff',
+            fontSize: '0.75rem',
+            fontWeight: 600,
+            '&:hover': {
+              backgroundColor: palette.primary.dark,
+            },
           }}
         >
           POST
         </Button>
       </FlexBetween>
+</Box>
 
       {/* COMMENTS LIST */}
-      <Box>
+      <Box display="flex" flexDirection="column" gap="0.25rem">
         {comments.map((comment, i) => (
           <CommentItem
             key={`${comment.userId}-${i}`} // Use a unique key
@@ -125,7 +142,7 @@ const Comments = ({ postId, comments }) => {
           />
         ))}
       </Box>
-      <Divider />
+      <Divider sx={{ mt: '0.75rem' }}/>
     </Box>
   );
 };

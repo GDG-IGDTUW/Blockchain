@@ -81,41 +81,43 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
   };
 
   return (
-    <Box>
+      <Box sx={{ mt: '0.5rem' }}>
       <Divider />
-      <FlexBetween sx={{ m: '0.5rem 0' }} alignItems="flex-start">
-        <Box display="flex" gap="1rem" width="100%">
+      <FlexBetween sx={{ py: '0.75rem', alignItems: 'flex-start' }}>
+        <Box display="flex" gap="0.75rem" width="100%">
           {/* Avatar */}
-          <UserImage image={comment.userPicturePath} size="35px" />
+          <UserImage image={comment.userPicturePath} size="38px" />
 
           <Box width="100%">
             {/* Author Name & Timestamp */}
             <Box display="flex" alignItems="center" gap="0.5rem">
-              <Typography variant="h6" sx={{ color: main }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, color: main }}>
                 {comment.firstName} {comment.lastName}
               </Typography>
 
-              <Typography variant="caption" sx={{ color: medium }}>
+              <Typography variant="caption" sx={{ color: medium, opacity: 0.8 }}>
                 {formatTimeAgo(comment.createdAt)}
               </Typography>
             </Box>
 
             {/* Comment Text or Edit Input */}
             {isEditing ? (
-              <FlexBetween gap="1rem">
+               <Box mt="0.5rem">
+              {/* <FlexBetween gap="1rem"> */}
                 <InputBase
                   value={editText}
                   onChange={(e) => setEditText(e.target.value)}
-                  sx={{
-                    backgroundColor: palette.neutral.light,
-                    borderRadius: '1rem',
-                    padding: '0.2rem 1rem',
-                    width: '100%',
-                    mt: '0.5rem',
-                  }}
                   multiline
-                />
-                <Box display="flex">
+                fullWidth
+                sx={{
+                  backgroundColor: palette.neutral.light,
+                  borderRadius: '0.75rem',
+                  px: '0.75rem',
+                  py: '0.5rem',
+                  fontSize: '0.875rem',
+                }}
+              />
+                <Box display="flex" justifyContent="flex-end" gap="0.25rem" mt="0.25rem">
                   <IconButton onClick={handleSave}>
                     <Save sx={{ color: palette.primary.main }} />
                   </IconButton>
@@ -123,9 +125,15 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
                     <Cancel sx={{ color: palette.error.main }} />
                   </IconButton>
                 </Box>
-              </FlexBetween>
+                </Box>
+            // </FlexBetween>
             ) : (
-              <Typography sx={{ color: medium, m: '0.5rem 0' }}>
+              <Typography sx={{
+                mt: '0.4rem',
+                fontSize: '0.9rem',
+                color: medium,
+                lineHeight: 1.5,
+              }}>
                 {comment.comment}
               </Typography>
             )}
@@ -133,18 +141,18 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
         </Box>
 
         {/* Actions (Like, Edit, Delete) */}
-        <Box display="flex" flexDirection="column" alignItems="center">
+        <Box display="flex" flexDirection="column" alignItems="center" minWidth="40px">
           <IconButton onClick={handleLike} size="small">
             {isLiked ? (
               <Favorite fontSize="small" sx={{ color: palette.primary.main }} />
             ) : (
-              <FavoriteBorder fontSize="small" />
+              <FavoriteBorder fontSize="small" sx={{ color: medium }} />
             )}
           </IconButton>
 
           {/* Edit/Delete Buttons (Only for Owner) */}
           {comment.userId === loggedInUserId && !isEditing && (
-            <Box display="flex" mt="0.2rem">
+            <Box display="flex" gap="0.25rem" mt="0.25rem">
               <IconButton onClick={() => setIsEditing(true)} size="small">
                 <EditOutlined fontSize="small" sx={{ color: medium }} />
               </IconButton>

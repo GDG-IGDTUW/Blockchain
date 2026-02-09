@@ -1,6 +1,6 @@
-import { Box, CircularProgress } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import { useParams, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Navbar from 'scenes/navbar';
 import PostWidget from 'scenes/widgets/PostWidget';
@@ -13,13 +13,25 @@ const PostPage = () => {
   const post = useSelector((state) =>
     state.posts.find((p) => p._id === postId)
   );
+  const posts = useSelector((state) => state.posts || []);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const getPost = async () => {
-    const response = await fetch(`http://localhost:3001/posts/${postId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await response.json();
-    dispatch(setPost({ post: data }));
+    try {
+      const response = await fetch(`http://localhost:3001/posts/${postId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error('Post not found');
+      const data = await response.json();
+      dispatch(setPost({ post: data }));
+    } catch (err) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -38,7 +50,7 @@ const PostPage = () => {
     <Box>
       <Navbar />
 
-      <Box width="60%" margin="2rem auto">
+      <Box width="60%" margin="2rem auto" minWidth="300px">
         <PostWidget
           postId={post._id}
           postUserId={post.userId}

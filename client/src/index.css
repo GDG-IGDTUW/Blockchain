@@ -1,10 +1,33 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap');
 
-html,
+/* html,
 body,
 #root,
 .app {
   height: 100%;
   width: 100%;
   font-family: 'Rubik', sans-serif;
+} */
+/* ===== Design Tokens ===== */
+:root {
+  --primary: #2563eb;
+  --secondary: #9333ea;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --text: #1e293b;
+  --border: #e2e8f0;
+  --radius: 10px;
+}
+
+/* Reset */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
 }

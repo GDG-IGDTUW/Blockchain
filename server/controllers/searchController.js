@@ -4,7 +4,13 @@ import Post from '../models/Post.js';
 // Search users by name or username
 export const searchUsers = async (req, res) => {
   try {
-    const { searchQuery , page = 1, limit = 10 } = req.query;
+    const { searchQuery , page = 1, limit = 10 } = req.query;if (!searchQuery || searchQuery.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a name to search.',
+      });
+    }
+
     const searchRegex = new RegExp(searchQuery, 'i'); // case-insensitive
 
     const users = await User.find({
@@ -16,14 +22,19 @@ export const searchUsers = async (req, res) => {
     res.json(users);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message:'Unable to search users right now. Please try again later.' });
   }
 };
 
 // Search posts by content
 export const searchPosts = async (req, res) => {
   try {
-    const { searchQuery, page = 1, limit = 10 } = req.query;
+    const { searchQuery, page = 1, limit = 10 } = req.query;if (!searchQuery || searchQuery.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a keyword to search posts.',
+      });
+    }
 
     const searchRegex = new RegExp(searchQuery, 'i');
     // Text search on 'content' field
@@ -35,7 +46,7 @@ export const searchPosts = async (req, res) => {
     res.json(posts);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message:'Unable to search posts at the moment.' });
   }
 };
 
@@ -43,6 +54,12 @@ export const searchPosts = async (req, res) => {
 export const searchHashtags = async (req, res) => {
   try {
     const { hashtag, page = 1, limit = 10 } = req.query;
+if (!hashtag || hashtag.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        message: 'Please enter a hashtag to search.',
+      });
+    }
 
     const posts = await Post.find({ hashtags: hashtag })
       .skip((page - 1) * limit)
@@ -51,7 +68,7 @@ export const searchHashtags = async (req, res) => {
     res.json(posts);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: 'Unable to search hashtags right now.' });
   }
 };
 
@@ -74,6 +91,6 @@ export const searchAll = async (req, res) => {
     res.json({ users, posts });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).json({ message: 'Search service is currently unavailable. Please try again later.'});
   }
 };

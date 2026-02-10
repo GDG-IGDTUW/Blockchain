@@ -5,9 +5,16 @@ export const getUser = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User profile not found.',
+      });
+    }
+
     res.status(200).json(user);
   } catch (err) {
-    res.status(500).json({ msg: 'Could not load user profile.' });
+    res.status(500).json({ msg: 'Unable to load the user profile. Please try again later.' });
   }
 };
 
@@ -15,6 +22,12 @@ export const getUserFriends = async (req, res) => {
   try {
     const { id } = req.params;
     const user = await User.findById(id);
+     if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found.',
+      });
+    }
 
     const friends = await Promise.all(
       user.friends.map((friendId) => User.findById(friendId))
@@ -26,7 +39,7 @@ export const getUserFriends = async (req, res) => {
     );
     res.status(200).json(formattedFriends);
   } catch (err) {
-    res.status(500).json({ msg: "Could not load user's friends." });
+    res.status(500).json({ msg: "Unable to load this user's friends list."});
   }
 };
 
@@ -50,7 +63,7 @@ export const getUserBySearch = async (req, res) => {
 
     res.status(200).json(users);
   } catch (err) {
-    res.status(404).json({ message: err.message });
+    res.status(404).json({msg : 'Unable to search users at the moment.'});
   }
 };
 
@@ -60,6 +73,12 @@ export const addRemoveFriend = async (req, res) => {
     const { id, friendId } = req.params;
     const user = await User.findById(id);
     const friend = await User.findById(friendId);
+    if (!user || !friend) {
+      return res.status(404).json({
+        success: false,
+        message: 'User or friend not found.',
+      });
+    }
 
     if (user.friends.includes(friendId)) {
       user.friends = user.friends.filter((id) => id !== friendId);
@@ -82,6 +101,6 @@ export const addRemoveFriend = async (req, res) => {
 
     res.status(200).json(formattedFriends);
   } catch (err) {
-    res.status(500).json({ msg: 'Could not update friends list.' });
+    res.status(500).json({ msg: 'Unable to update the friends list. Please try again later.' });
   }
 };

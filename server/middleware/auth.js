@@ -5,7 +5,7 @@ export const verifyToken = async (req, res, next) => {
     let authorizationHeader = req.header('Authorization');
 
     if (!authorizationHeader) {
-      return res.status(401).json({ msg: 'Authorization is required.' });
+      return res.status(401).json({ msg: 'You are not logged in. Please provide an authorization token.' });
     }
 
     if (authorizationHeader.startsWith('Bearer ')) {
@@ -16,6 +16,6 @@ export const verifyToken = async (req, res, next) => {
     req.user = decodedToken;
     next();
   } catch (err) {
-    res.status(401).json({ msg: 'Invalid or expired authorization token.' });
+    res.status(401).json({ msg: 'Invalid authentication token. Please log in again.' });
   }
 };

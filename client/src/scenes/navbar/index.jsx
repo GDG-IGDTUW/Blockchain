@@ -34,6 +34,7 @@ const Navbar = () => {
   // --- SEARCH STATES ---
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [searchError, setSearchError] = useState('');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -53,6 +54,7 @@ const Navbar = () => {
   // --- FINAL SEARCH FUNCTION ---
   const handleSearch = async (query) => {
     setSearchQuery(query);
+    setSearchError('');
 
     // If input is empty, clear results and return
     if (!query || query.trim() === '') {
@@ -64,12 +66,31 @@ const Navbar = () => {
       const res = await fetch(`http://localhost:3001/search/all?q=${query}`);
       const data = await res.json();
 
+      if (!res.ok) {
+        if (res.status === 401) {
+          throw new Error('Please login to search users and posts.');
+        }
+        if (res.status === 404) {
+          throw new Error('No results found.');
+        }
+        if (res.status >= 500) {
+          throw new Error('Search service is unavailable. Try again later.');
+        }
+        throw new Error('Failed to fetch search results.');
+      }
+
+      if (data.users.length === 0 && data.posts.length === 0) {
+        setSearchResults([]);
+        setSearchError('No users or posts found.');
+        return;
+      }
       setSearchResults([
         ...data.users.map((u) => ({ ...u, type: 'user' })),
         ...data.posts.map((p) => ({ ...p, type: 'post' })),
       ]);
     } catch (err) {
-      console.error(err);
+      setSearchResults([]);
+      setSearchError(err.message || 'Unable to search. Check your connection.');
     }
   };
 
@@ -94,65 +115,75 @@ const Navbar = () => {
         {/* --- SEARCH BAR SECTION --- */}
         {isNonMobileScreens && (
           <Box position="relative">
-           <FlexBetween
-  backgroundColor={neutralLight}
-  borderRadius="999px"
-  gap="1rem"
-  padding="0.35rem 1rem"
-  minWidth="300px"
-  boxShadow="inset 0 0 0 1px rgba(0,0,0,0.06)"
->
+            <FlexBetween
+              backgroundColor={neutralLight}
+              borderRadius="999px"
+              gap="1rem"
+              padding="0.35rem 1rem"
+              minWidth="300px"
+              boxShadow="inset 0 0 0 1px rgba(0,0,0,0.06)"
+            >
               <InputBase
                 placeholder="Search users or posts..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                 sx={{
-    flex: 1,
-    fontSize: '0.9rem',
-  }}
+                sx={{
+                  flex: 1,
+                  fontSize: '0.9rem',
+                }}
               />
               <IconButton onClick={() => handleSearch(searchQuery)}>
                 <Search />
               </IconButton>
             </FlexBetween>
 
+            {searchError && (
+              <Typography
+                color="error"
+                fontSize="0.8rem"
+                mt="0.25rem"
+                ml="0.5rem"
+              >
+                {searchError}
+              </Typography>
+            )}
+
             {/* --- SEARCH RESULTS DROPDOWN --- */}
             {searchResults.length > 0 && (
               <Box
-  position="absolute"
-  top="110%"
-  left="0"
-  zIndex="20"
-  width="100%"
-  backgroundColor={alt}
-  borderRadius="12px"
-  boxShadow="0 12px 32px rgba(0,0,0,0.12)"
-  maxHeight="300px"
-  overflow="auto"
-  border={`1px solid ${neutralLight}`}
->
-
+                position="absolute"
+                top="110%"
+                left="0"
+                zIndex="20"
+                width="100%"
+                backgroundColor={alt}
+                borderRadius="12px"
+                boxShadow="0 12px 32px rgba(0,0,0,0.12)"
+                maxHeight="300px"
+                overflow="auto"
+                border={`1px solid ${neutralLight}`}
+              >
                 <List dense>
                   {searchResults.map((item) => (
                     <ListItem
                       key={item._id}
                       button
                       sx={{
-    borderRadius: '8px',
-    mx: '0.5rem',
-    my: '0.25rem',
-    '&:hover': {
-      backgroundColor: neutralLight,
-    },
-  }}
+                        borderRadius: '8px',
+                        mx: '0.5rem',
+                        my: '0.25rem',
+                        '&:hover': {
+                          backgroundColor: neutralLight,
+                        },
+                      }}
                       onClick={() => {
                         navigate(
                           item.type === 'user'
                             ? `/profile/${item._id}`
                             : `/post/${item._id}`
                         );
-                            setSearchResults([]);
-    setSearchQuery('');
+                        setSearchResults([]);
+                        setSearchQuery('');
                       }}
                     >
                       <ListItemText

@@ -1,3 +1,5 @@
+//  Handles user profile, friends and user search operations.
+ 
 import express from 'express';
 import {
   getUser,
@@ -9,14 +11,16 @@ import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-/* READ */
+// Get a user's profile information
 router.get('/:id', verifyToken, getUser);
+
+// Get list of user's friends
 router.get('/:id/friends', verifyToken, getUserFriends);
 
-/* SEARCH USER ROUTE */
+// Search users by name or username
 router.get('/search/:query', verifyToken, getUserBySearch); // <--- Added this route
 
-/* UPDATE */
+// Add or remove a friend
 router.patch('/:id/:friendId', verifyToken, addRemoveFriend);
 
 export default router;

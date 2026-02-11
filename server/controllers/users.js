@@ -1,6 +1,13 @@
+/* andles all user-related operations:
+  - Fetch user profile
+  - Fetch friends list
+  - Search users
+  - Add or remove friends
+ */
+
 import User from '../models/User.js';
 
-/* READ */
+// Fetch a user profile by ID
 export const getUser = async (req, res) => {
   try {
     const { id } = req.params;
@@ -18,6 +25,7 @@ export const getUser = async (req, res) => {
   }
 };
 
+// Fetch all friends of a user
 export const getUserFriends = async (req, res) => {
   try {
     const { id } = req.params;
@@ -29,9 +37,12 @@ export const getUserFriends = async (req, res) => {
       });
     }
 
+    // Fetch all friend documents
     const friends = await Promise.all(
       user.friends.map((friendId) => User.findById(friendId))
     );
+
+    // Return only safe public fields
     const formattedFriends = friends.map(
       ({ _id, firstName, lastName, occupation, location, picturePath }) => {
         return { _id, firstName, lastName, occupation, location, picturePath };
@@ -43,7 +54,7 @@ export const getUserFriends = async (req, res) => {
   }
 };
 
-/* SEARCH USER */
+/* SEARCH USER :  Search users by first name or last name */
 export const getUserBySearch = async (req, res) => {
   try {
     const { query } = req.params;
@@ -67,7 +78,7 @@ export const getUserBySearch = async (req, res) => {
   }
 };
 
-/* UPDATE */
+/* UPDATE : Add or remove a friend from user's friend list */
 export const addRemoveFriend = async (req, res) => {
   try {
     const { id, friendId } = req.params;
@@ -80,6 +91,7 @@ export const addRemoveFriend = async (req, res) => {
       });
     }
 
+    //  If friend already exists → remove   , Else → add
     if (user.friends.includes(friendId)) {
       user.friends = user.friends.filter((id) => id !== friendId);
       friend.friends = friend.friends.filter((id) => id !== id);
@@ -90,6 +102,7 @@ export const addRemoveFriend = async (req, res) => {
     await user.save();
     await friend.save();
 
+    // Return updated friends list
     const friends = await Promise.all(
       user.friends.map((id) => User.findById(id))
     );

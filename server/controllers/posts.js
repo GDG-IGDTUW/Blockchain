@@ -1,11 +1,21 @@
+/* Handles all post-related operations:
+   - Creating posts
+   - Fetching feed & user posts
+   - Likes
+   - Comments (add, edit, delete)
+ */
 import Post from '../models/Post.js';
 import User from '../models/User.js';
 import mongoose from 'mongoose';
 
 /* CREATE POST */
+/* Creates a new post for a logged-in user.
+Stores the post in MongoDB and returns updated feed.  */
 export const createPost = async (req, res) => {
   try {
     const { userId, description, picturePath } = req.body;
+
+    // Validate required input
     if (!userId || !description) {
       return res.status(400).json({
         success: false,
@@ -13,6 +23,7 @@ export const createPost = async (req, res) => {
       });
     }
 
+    // Fetch user from DB to attach profile info to post
     const user = await User.findById(userId);
      if (!user) {
       return res.status(404).json({
@@ -21,6 +32,7 @@ export const createPost = async (req, res) => {
       });
     }
 
+    // Create new Post document
     const newPost = new Post({
       userId,
       firstName: user.firstName,
@@ -32,8 +44,11 @@ export const createPost = async (req, res) => {
       likes: {},
       comments: [],
     });
+
+    // Save post to database
     await newPost.save();
 
+    // Return updated feed
     const posts = await Post.find();
     res.status(201).json(posts);
   } catch (err) {
@@ -46,15 +61,17 @@ export const createPost = async (req, res) => {
 };
 
 /* READ POSTS */
+// Fetches all posts for the main feed
 export const getFeedPosts = async (req, res) => {
   try {
-    const posts = await Post.find();
-    res.status(200).json(posts);
+    const posts = await Post.find();        // Read all posts
+    res.status(200).json(posts); 
   } catch (err) {
     res.status(500).json({ msg: 'Failed to load the feed. Please refresh the page.' });
   }
 };
 
+//  Fetches all posts created by a specific user
 export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -66,7 +83,7 @@ export const getUserPosts = async (req, res) => {
       });
     }
 
-    const posts = await Post.find({ userId });
+    const posts = await Post.find({ userId });     // Filter by userId
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ msg: "Could not load this user's posts." });
@@ -74,6 +91,7 @@ export const getUserPosts = async (req, res) => {
 };
 
 /* UPDATE LIKES */
+// Toggles like/unlike for a post
 export const likePost = async (req, res) => {
   try {
     const { id } = req.params;
@@ -94,14 +112,15 @@ export const likePost = async (req, res) => {
       });
     }
 
+    // Toggle like status
     const isLiked = post.likes.get(userId);
-
     if (isLiked) {
       post.likes.delete(userId);
     } else {
       post.likes.set(userId, true);
     }
 
+    // Save updated likes
     const updatedPost = await Post.findByIdAndUpdate(
       id,
       { likes: post.likes },
@@ -116,7 +135,7 @@ export const likePost = async (req, res) => {
 
 /* --- COMMENT FEATURES --- */
 
-// 1. Post Comment
+// 1. Post Comment   :  Adds a new comment to a post
 export const postComment = async (req, res) => {
   try {
     const { id } = req.params;
@@ -149,6 +168,7 @@ export const postComment = async (req, res) => {
       });
     }
 
+    // Create new comment object
     const newComment = {
       _id: new mongoose.Types.ObjectId(), // Generate ID manually
       userId,
@@ -162,19 +182,19 @@ export const postComment = async (req, res) => {
 
     post.comments.push(newComment);
 
+    // Save updated comments array
     const updatedPost = await Post.findByIdAndUpdate(
       id,
       { comments: post.comments },
       { new: true }
     );
-
     res.status(200).json(updatedPost);
   } catch (err) {
     res.status(404).json({ message:'Failed to post your comment. Please try again.'});
   }
 };
 
-// 2. Delete Comment
+// 2. Delete Comment : Deletes a comment from a post
 export const deleteComment = async (req, res) => {
   try {
     const { id, commentId } = req.params;
@@ -214,7 +234,7 @@ export const deleteComment = async (req, res) => {
   }
 };
 
-// 3. Edit Comment
+// 3. Edit Comment : Updates an existing comment
 export const editComment = async (req, res) => {
   try {
     const { id, commentId } = req.params;
@@ -236,7 +256,7 @@ export const editComment = async (req, res) => {
       });
     }
 
-    // Find the specific comment index
+    // Find and update specific comment
     const commentIndex = post.comments.findIndex((item) => {
       return item._id.toString() === commentId;
     });

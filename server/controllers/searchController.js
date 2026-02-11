@@ -1,7 +1,14 @@
+/* Handles all search-related APIs:
+  - Search users
+  - Search posts
+  - Search by hashtags
+  - Global search
+ */
+
 import User from '../models/User.js';
 import Post from '../models/Post.js';
 
-// Search users by name or username
+// Search users by first name or last name
 export const searchUsers = async (req, res) => {
   try {
     const { searchQuery , page = 1, limit = 10 } = req.query;if (!searchQuery || searchQuery.trim() === '') {
@@ -11,8 +18,9 @@ export const searchUsers = async (req, res) => {
       });
     }
 
-    const searchRegex = new RegExp(searchQuery, 'i'); // case-insensitive
+    const searchRegex = new RegExp(searchQuery, 'i'); // case-insensitive search
 
+    // Find matching users using MongoDB regex
     const users = await User.find({
       $or: [{ firstName: searchRegex }, { lastName: searchRegex }],
     })
@@ -26,7 +34,7 @@ export const searchUsers = async (req, res) => {
   }
 };
 
-// Search posts by content
+// Search posts using keywords in description
 export const searchPosts = async (req, res) => {
   try {
     const { searchQuery, page = 1, limit = 10 } = req.query;if (!searchQuery || searchQuery.trim() === '') {
@@ -37,7 +45,8 @@ export const searchPosts = async (req, res) => {
     }
 
     const searchRegex = new RegExp(searchQuery, 'i');
-    // Text search on 'content' field
+
+    // Fetch posts that match description text
     const posts = await Post.find({ description: searchRegex })
       .populate('userId', 'firstName lastName')
       .skip((page - 1) * limit)
@@ -61,6 +70,7 @@ if (!hashtag || hashtag.trim() === '') {
       });
     }
 
+    // Fetch posts containing the hashtag
     const posts = await Post.find({ hashtags: hashtag })
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
@@ -72,7 +82,7 @@ if (!hashtag || hashtag.trim() === '') {
   }
 };
 
-// controllers/searchController.js
+// Search both users and posts together
 export const searchAll = async (req, res) => {
   try {
     const { searchQuery, page = 1, limit = 10 } = req.query;
@@ -80,10 +90,12 @@ export const searchAll = async (req, res) => {
 
     const searchRegex = new RegExp(searchQuery, 'i');
 
+    // Search users
     const users = await User.find({
       $or: [{ firstName: searchRegex }, { lastName: searchRegex }],
     }).limit(parseInt(limit));
 
+    // Search posts
     const posts = await Post.find({ description: regex })
       .populate('userId', 'firstName lastName')
       .limit(parseInt(limit));

@@ -1,3 +1,5 @@
+// Handles authentication-related routes like login.
+
 import express from 'express';
 import { login } from '../controllers/auth.js';
 

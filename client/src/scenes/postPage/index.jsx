@@ -1,57 +1,68 @@
-import { Box, Button, CircularProgress, Typography } from '@mui/material';
-import { useParams, Navigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import Navbar from 'scenes/navbar';
-import PostWidget from 'scenes/widgets/PostWidget';
-import { setPost } from 'state';
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
+import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Navbar from "scenes/navbar";
+import PostWidget from "scenes/widgets/PostWidget";
+import { setPost } from "state";
 
 const PostPage = () => {
   const { postId } = useParams();
   const dispatch = useDispatch();
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const token = useSelector((state) => state.token);
+
   const post = useSelector((state) =>
-    state.posts.find((p) => p._id === postId)
+    state.posts?.find((p) => p._id === postId)
   );
-  const posts = useSelector((state) => state.posts || []);
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(null);
 
-  const getPost = async () => {
+  const getPost = async (signal) => {
     try {
-      const response = await fetch(`http://localhost:3001/posts/${postId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await fetch(
+        `http://localhost:3001/posts/${postId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          signal,
+        }
+      );
 
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error('Your session expired. Please login again.');
-        }
-        if (response.status === 404) {
-          throw new Error('This post does not exist or was deleted.');
-        }
-        if (response.status >= 500) {
-          throw new Error('Server error. Please try again later.');
-        }
-        throw new Error('Failed to load post.');
+        if (response.status === 401)
+          throw new Error("Session expired. Please login again.");
+        if (response.status === 404)
+          throw new Error("Post not found.");
+        if (response.status >= 500)
+          throw new Error("Server error. Please try later.");
+        throw new Error("Failed to load post.");
       }
 
       const data = await response.json();
       dispatch(setPost({ post: data }));
+      setError(null);
     } catch (err) {
-      setError(err.message || 'Unable to load this post.');
+      if (err.name !== "AbortError") {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    getPost();
-  }, [postId]);
+    const controller = new AbortController();
+    setLoading(true);
+    getPost(controller.signal);
 
-   if (loading) {
+    return () => controller.abort();
+  }, [postId, token, dispatch]);
+
+  /* Loading */
+  if (loading) {
     return (
       <Box display="flex" justifyContent="center" mt="4rem">
         <CircularProgress />
@@ -59,18 +70,27 @@ const PostPage = () => {
     );
   }
 
-    // 🔴 Error state
+  /* Error */
   if (error) {
     return (
       <Box textAlign="center" mt="5rem">
-        <Typography color="error" fontSize="1.1rem" mb="1rem">
+        <Typography color="error" mb="1rem">
           {error}
         </Typography>
-        <Button
-          variant="contained"
-          onClick={() => navigate('/home')}
-        >
-          Go back to Home
+        <Button variant="contained" onClick={() => navigate("/home")}>
+          Go Back Home
+        </Button>
+      </Box>
+    );
+  }
+
+  /* Post missing (safety net) */
+  if (!post) {
+    return (
+      <Box textAlign="center" mt="5rem">
+        <Typography>Post not available.</Typography>
+        <Button variant="contained" onClick={() => navigate("/home")}>
+          Go Home
         </Button>
       </Box>
     );
@@ -79,7 +99,6 @@ const PostPage = () => {
   return (
     <Box>
       <Navbar />
-
       <Box width="60%" margin="2rem auto" minWidth="300px">
         <PostWidget
           postId={post._id}

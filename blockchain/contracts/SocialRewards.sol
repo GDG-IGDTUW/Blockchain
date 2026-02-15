@@ -20,6 +20,8 @@ contract SocialRewards {
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Registration(address indexed user, uint256 reward);
     event PostReward(address indexed user, uint256 posts, uint256 reward);
+    event PostCreated(address indexed user, uint256 postCount, uint256 timestamp);
+    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner, uint256 timestamp);
     
     modifier onlyOwner() {
         require(msg.sender == owner, "Not authorized");
@@ -49,6 +51,9 @@ contract SocialRewards {
         require(hasRegistered[user], "User not registered");
         
         postCount[user]++;
+        
+        // Emit PostCreated event for every post
+        emit PostCreated(user, postCount[user], block.timestamp);
         
         // Check if user has completed 10 posts since last reward
         uint256 postsForReward = postCount[user] - lastRewardedPostCount[user];
@@ -95,6 +100,8 @@ contract SocialRewards {
     
     function transferOwnership(address newOwner) external onlyOwner {
         require(newOwner != address(0), "Invalid address");
+        address previousOwner = owner;
         owner = newOwner;
+        emit OwnershipTransferred(previousOwner, newOwner, block.timestamp);
     }
 }

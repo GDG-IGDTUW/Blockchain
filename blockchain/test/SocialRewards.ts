@@ -46,6 +46,19 @@ describe("SocialRewards", async function () {
         /User already registered/
       );
     });
+
+    it("Should emit Registration event on user registration", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+      
+      const hash = await socialRewards.write.registerUser([user1.account.address]);
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      
+      const registrationEvent = receipt.logs.find(
+        (log) => log.topics[0] === socialRewards.getEvents.Registration().topics[0]
+      );
+      
+      assert.ok(registrationEvent, "Registration event should be emitted");
+    });
   });
 
   describe("Post Rewards", async function () {
@@ -92,6 +105,42 @@ describe("SocialRewards", async function () {
         /User not registered/
       );
     });
+
+    it("Should emit PostCreated event for every post", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+      
+      await socialRewards.write.registerUser([user1.account.address]);
+      
+      const hash = await socialRewards.write.recordPost([user1.account.address]);
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      
+      const postCreatedEvent = receipt.logs.find(
+        (log) => log.topics[0] === socialRewards.getEvents.PostCreated().topics[0]
+      );
+      
+      assert.ok(postCreatedEvent, "PostCreated event should be emitted");
+    });
+
+    it("Should emit PostReward event when user earns reward", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+      
+      await socialRewards.write.registerUser([user1.account.address]);
+      
+      // Record 9 posts (no reward yet)
+      for (let i = 0; i < 9; i++) {
+        await socialRewards.write.recordPost([user1.account.address]);
+      }
+      
+      // 10th post should trigger reward
+      const hash = await socialRewards.write.recordPost([user1.account.address]);
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      
+      const postRewardEvent = receipt.logs.find(
+        (log) => log.topics[0] === socialRewards.getEvents.PostReward().topics[0]
+      );
+      
+      assert.ok(postRewardEvent, "PostReward event should be emitted on 10th post");
+    });
   });
 
   describe("Token Transfer", async function () {
@@ -129,6 +178,41 @@ describe("SocialRewards", async function () {
       assert.equal(stats[1], 1n * 10n ** 18n); // balance (only registration reward)
       assert.equal(stats[2], 7n); // posts
       assert.equal(stats[3], 3n); // postsUntilNextReward
+    });
+  });
+
+  describe("Ownership Transfer", async function () {
+    it("Should transfer ownership to new owner", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+      
+      await socialRewards.write.transferOwnership([user1.account.address]);
+      
+      const newOwner = await socialRewards.read.owner();
+      assert.equal(newOwner.toLowerCase(), user1.account.address.toLowerCase());
+    });
+
+    it("Should emit OwnershipTransferred event", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+      
+      const hash = await socialRewards.write.transferOwnership([user1.account.address]);
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      
+      const ownershipEvent = receipt.logs.find(
+        (log) => log.topics[0] === socialRewards.getEvents.OwnershipTransferred().topics[0]
+      );
+      
+      assert.ok(ownershipEvent, "OwnershipTransferred event should be emitted");
+    });
+
+    it("Should not allow non-owner to transfer ownership", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+      
+      await assert.rejects(
+        async () => await socialRewards.write.transferOwnership([user2.account.address], {
+          account: user1.account,
+        }),
+        /Not authorized/
+      );
     });
   });
 });

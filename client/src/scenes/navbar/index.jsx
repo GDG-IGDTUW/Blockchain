@@ -27,6 +27,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setMode, setLogout } from "state";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "components/FlexBetween";
+import WalletConnect from "components/WalletConnect";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -169,6 +170,7 @@ setSearchResults([
           <Message sx={{ fontSize: "25px" }} />
           <Notifications sx={{ fontSize: "25px" }} />
           <Help sx={{ fontSize: "25px" }} />
+          <WalletConnect />
           <FormControl variant="standard" value={fullName}>
             <Select
               value={fullName}
@@ -244,6 +246,7 @@ setSearchResults([
             <Message sx={{ fontSize: "25px" }} />
             <Notifications sx={{ fontSize: "25px" }} />
             <Help sx={{ fontSize: "25px" }} />
+            <WalletConnect />
             <FormControl variant="standard" value={fullName}>
               <Select
                 value={fullName}

@@ -5,6 +5,7 @@ const initialState = {
   user: null,
   token: null,
   posts: [],
+  walletAddress: null,
 };
 
 export const authSlice = createSlice({
@@ -39,9 +40,15 @@ export const authSlice = createSlice({
       });
       state.posts = updatedPosts;
     },
+    setWallet: (state, action) => {
+      state.walletAddress = action.payload.walletAddress;
+    },
+    clearWallet: (state) => {
+      state.walletAddress = null;
+    },
   },
 });
 
-export const { setMode, setLogin, setLogout, setFriends, setPosts, setPost } =
+export const { setMode, setLogin, setLogout, setFriends, setPosts, setPost, setWallet, clearWallet } =
   authSlice.actions;
 export default authSlice.reducer;

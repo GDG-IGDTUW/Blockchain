@@ -18,8 +18,10 @@ contract SocialRewards {
     mapping(address => uint256) public lastRewardedPostCount;
     
     event Transfer(address indexed from, address indexed to, uint256 value);
-    event Registration(address indexed user, uint256 reward);
-    event PostReward(address indexed user, uint256 posts, uint256 reward);
+    event UserRegistered(address indexed user, uint256 timestamp);
+    event PostCreated(address indexed user, uint256 postCount);
+    event TipSent(address indexed from, address indexed to, uint256 amount);
+    event PostRewarded(address indexed user, uint256 newBalance);
     
     modifier onlyOwner() {
         require(msg.sender == owner, "Not authorized");
@@ -51,13 +53,15 @@ contract SocialRewards {
         balanceOf[user] += REGISTRATION_REWARD;
         
         emit Transfer(owner, user, REGISTRATION_REWARD);
-        emit Registration(user, REGISTRATION_REWARD);
+        emit UserRegistered(user, block.timestamp);
     }
     
     function recordPost(address user) external onlyOwner {
         require(hasRegistered[user], "User not registered");
         //Gas Heavy- increment in the storage (Read-Modify-Write Cycle)
         postCount[user]++;
+        
+        emit PostCreated(user, postCount[user]);
         
         // Check if user has completed 10 posts since last reward
         uint256 postsForReward = postCount[user] - lastRewardedPostCount[user];
@@ -78,7 +82,7 @@ contract SocialRewards {
             lastRewardedPostCount[user] = postCount[user] - (postsForReward % POSTS_REQUIRED);
             
             emit Transfer(owner, user, rewardAmount);
-            emit PostReward(user, postCount[user], rewardAmount);
+            emit PostRewarded(user, balanceOf[user]);
         }
     }
     
@@ -90,6 +94,7 @@ contract SocialRewards {
         balanceOf[to] += value;
         
         emit Transfer(msg.sender, to, value);
+        emit TipSent(msg.sender, to, value);
         return true;
     }
     

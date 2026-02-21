@@ -131,4 +131,94 @@ describe("SocialRewards", async function () {
       assert.equal(stats[3], 3n); // postsUntilNextReward
     });
   });
+
+  describe("Events", async function () {
+    it("Should emit UserRegistered event on registration", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      const txHash = await socialRewards.write.registerUser([user1.account.address]);
+      const receipt = await publicClient.getTransactionReceipt({ hash: txHash });
+
+      const logs = await publicClient.getContractEvents({
+        address: socialRewards.address,
+        abi: socialRewards.abi,
+        eventName: "UserRegistered",
+        fromBlock: receipt.blockNumber,
+        toBlock: receipt.blockNumber,
+      });
+
+      assert.equal(logs.length, 1);
+      assert.equal(logs[0].args.user!.toLowerCase(), user1.account.address.toLowerCase());
+      assert.ok(logs[0].args.timestamp! > 0n);
+    });
+
+    it("Should emit PostCreated event on each post", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      await socialRewards.write.registerUser([user1.account.address]);
+      const txHash = await socialRewards.write.recordPost([user1.account.address]);
+      const receipt = await publicClient.getTransactionReceipt({ hash: txHash });
+
+      const logs = await publicClient.getContractEvents({
+        address: socialRewards.address,
+        abi: socialRewards.abi,
+        eventName: "PostCreated",
+        fromBlock: receipt.blockNumber,
+        toBlock: receipt.blockNumber,
+      });
+
+      assert.equal(logs.length, 1);
+      assert.equal(logs[0].args.user!.toLowerCase(), user1.account.address.toLowerCase());
+      assert.equal(logs[0].args.postCount, 1n);
+    });
+
+    it("Should emit PostRewarded event after 10 posts", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      await socialRewards.write.registerUser([user1.account.address]);
+
+      let lastTxHash;
+      for (let i = 0; i < 10; i++) {
+        lastTxHash = await socialRewards.write.recordPost([user1.account.address]);
+      }
+      const receipt = await publicClient.getTransactionReceipt({ hash: lastTxHash! });
+
+      const logs = await publicClient.getContractEvents({
+        address: socialRewards.address,
+        abi: socialRewards.abi,
+        eventName: "PostRewarded",
+        fromBlock: receipt.blockNumber,
+        toBlock: receipt.blockNumber,
+      });
+
+      assert.equal(logs.length, 1);
+      assert.equal(logs[0].args.user!.toLowerCase(), user1.account.address.toLowerCase());
+      assert.equal(logs[0].args.newBalance, 2n * 10n ** 18n); // 1 registration + 1 post reward
+    });
+
+    it("Should emit TipSent event on token transfer", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      await socialRewards.write.registerUser([user1.account.address]);
+
+      const tipAmount = 5n * 10n ** 17n; // 0.5 tokens
+      const txHash = await socialRewards.write.transfer([user2.account.address, tipAmount], {
+        account: user1.account,
+      });
+      const receipt = await publicClient.getTransactionReceipt({ hash: txHash });
+
+      const logs = await publicClient.getContractEvents({
+        address: socialRewards.address,
+        abi: socialRewards.abi,
+        eventName: "TipSent",
+        fromBlock: receipt.blockNumber,
+        toBlock: receipt.blockNumber,
+      });
+
+      assert.equal(logs.length, 1);
+      assert.equal(logs[0].args.from!.toLowerCase(), user1.account.address.toLowerCase());
+      assert.equal(logs[0].args.to!.toLowerCase(), user2.account.address.toLowerCase());
+      assert.equal(logs[0].args.amount, tipAmount);
+    });
+  });
 });

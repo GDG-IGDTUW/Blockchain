@@ -3,21 +3,21 @@ import {
   EditOutlined,
   LocationOnOutlined,
   WorkOutlineOutlined,
-} from "@mui/icons-material";
-import { Box, Typography, Divider, useTheme } from "@mui/material";
-import UserImage from "components/UserImage";
-import FlexBetween from "components/FlexBetween";
-import WidgetWrapper from "components/WidgetWrapper";
-import { useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+} from '@mui/icons-material';
+import { Box, Typography, Divider, useTheme } from '@mui/material';
+import UserImage from 'components/UserImage';
+import FlexBetween from 'components/FlexBetween';
+import WidgetWrapper from 'components/WidgetWrapper';
+import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const UserWidget = ({ userId, picturePath }) => {
   const [user, setUser] = useState(null);
   const { palette } = useTheme();
   const navigate = useNavigate();
   const token = useSelector((state) => state.token);
-  
+
   // 1. GLOBAL STATE SE DATA LO (Live Updates ke liye)
   const loggedInUserId = useSelector((state) => state.user._id);
   const globalFriends = useSelector((state) => state.user.friends);
@@ -28,7 +28,7 @@ const UserWidget = ({ userId, picturePath }) => {
 
   const getUser = async () => {
     const response = await fetch(`http://localhost:3001/users/${userId}`, {
-      method: "GET",
+      method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await response.json();
@@ -56,9 +56,8 @@ const UserWidget = ({ userId, picturePath }) => {
   // 2. SMART COUNT LOGIC
   // Agar ye meri profile hai -> Global Redux State (Live) use karo
   // Agar kisi aur ki profile hai -> API Data (user.friends) use karo
-  const friendsCount = (userId === loggedInUserId) 
-    ? globalFriends.length 
-    : friends.length;
+  const friendsCount =
+    userId === loggedInUserId ? globalFriends.length : friends.length;
 
   return (
     <WidgetWrapper>
@@ -76,17 +75,17 @@ const UserWidget = ({ userId, picturePath }) => {
               color={dark}
               fontWeight="500"
               sx={{
-                "&:hover": {
+                '&:hover': {
                   color: palette.primary.light,
-                  cursor: "pointer",
+                  cursor: 'pointer',
                 },
               }}
             >
               {firstName} {lastName}
             </Typography>
             <Typography color={medium}>
-                {/* 3. YAHAN UPDATED COUNT DIKHAO */}
-                {friendsCount} friends
+              {/* 3. YAHAN UPDATED COUNT DIKHAO */}
+              {friendsCount} friends
             </Typography>
           </Box>
         </FlexBetween>

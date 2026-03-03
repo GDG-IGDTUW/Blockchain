@@ -1,7 +1,7 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setPosts } from "state";
-import PostWidget from "./PostWidget";
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setPosts } from 'state';
+import PostWidget from './PostWidget';
 
 const PostsWidget = ({ userId, isProfile = false }) => {
   const dispatch = useDispatch();
@@ -9,8 +9,8 @@ const PostsWidget = ({ userId, isProfile = false }) => {
   const token = useSelector((state) => state.token);
 
   const getPosts = async () => {
-    const response = await fetch("http://localhost:3001/posts", {
-      method: "GET",
+    const response = await fetch('http://localhost:3001/posts', {
+      method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await response.json();
@@ -21,7 +21,7 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     const response = await fetch(
       `http://localhost:3001/posts/${userId}/posts`,
       {
-        method: "GET",
+        method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       }
     );

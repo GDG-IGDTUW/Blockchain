@@ -1,10 +1,10 @@
-import { Box, CircularProgress } from "@mui/material";
-import { useParams, Navigate } from "react-router-dom";
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import Navbar from "scenes/navbar";
-import PostWidget from "scenes/widgets/PostWidget";
-import { setPost } from "state";
+import { Box, CircularProgress } from '@mui/material';
+import { useParams, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import Navbar from 'scenes/navbar';
+import PostWidget from 'scenes/widgets/PostWidget';
+import { setPost } from 'state';
 
 const PostPage = () => {
   const { postId } = useParams();
@@ -15,12 +15,9 @@ const PostPage = () => {
   );
 
   const getPost = async () => {
-    const response = await fetch(
-      `http://localhost:3001/posts/${postId}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    const response = await fetch(`http://localhost:3001/posts/${postId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
     const data = await response.json();
     dispatch(setPost({ post: data }));
   };

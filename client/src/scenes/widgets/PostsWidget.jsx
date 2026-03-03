@@ -11,6 +11,9 @@ const PostsWidget = ({ userId, isProfile = false }) => {
   const posts = useSelector((state) => state.posts);
   const token = useSelector((state) => state.token);
 
+  const [loading, setLoading] = useState(false);
+
+
   const getPosts = async () => {
     setIsLoading(true);
     const response = await fetch("http://localhost:3001/posts", {
@@ -27,14 +30,19 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     const response = await fetch(
       `http://localhost:3001/posts/${userId}/posts`,
       {
-        method: "GET",
+        method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       },
     );
     const data = await response.json();
     dispatch(setPosts({ posts: data }));
-    setIsLoading(false);
-  };
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     if (isProfile) {

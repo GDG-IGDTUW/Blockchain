@@ -20,6 +20,7 @@ const UserWidget = ({ userId, picturePath }) => {
   const navigate = useNavigate();
   const token = useSelector((state) => state.token);
 
+  // 1. GLOBAL STATE SE DATA LO (Live Updates ke liye)
   const loggedInUserId = useSelector((state) => state.user._id);
   const globalFriends = useSelector((state) => state.user.friends);
 
@@ -30,7 +31,7 @@ const UserWidget = ({ userId, picturePath }) => {
   const getUser = async () => {
     setIsLoading(true);
     const response = await fetch(`http://localhost:3001/users/${userId}`, {
-      method: "GET",
+      method: 'GET',
       headers: { Authorization: `Bearer ${token}` },
     });
     const data = await response.json();
@@ -56,6 +57,9 @@ const UserWidget = ({ userId, picturePath }) => {
     friends,
   } = user;
 
+  // 2. SMART COUNT LOGIC
+  // Agar ye meri profile hai -> Global Redux State (Live) use karo
+  // Agar kisi aur ki profile hai -> API Data (user.friends) use karo
   const friendsCount =
     userId === loggedInUserId ? globalFriends.length : friends.length;
 

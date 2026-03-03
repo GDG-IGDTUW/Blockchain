@@ -114,6 +114,50 @@ npm install
 npm start
 ```
 
+---
+
+## 📸 Application Screenshots
+
+### 🔐 Authentication – Register
+
+User registration page where new users can create an account.
+
+![Register Page](screenshots/auth-register.png)
+
+---
+
+### 🔐 Authentication – Login
+
+Login page for existing users to access the platform.
+
+![Login Page](screenshots/auth-login.png)
+
+---
+
+### 🏠 Home / Feed
+
+Main feed displaying user posts, profile summary, and friend list.
+
+![Home Feed](screenshots/home-feed.png)
+
+---
+
+### ✍️ Create Post
+
+Interface for creating a new post with image and attachments.
+
+![Create Post](screenshots/create-post.png)
+
+---
+
+### 💬 Post Details
+
+Post view showing likes, comments, and interactions.
+
+![Post Details](screenshots/post-detail.png)
+
+---
+
 ## 🔗 Smart Contract Details
 
 **Contract Name**: SocialRewards  
@@ -132,6 +176,7 @@ npm start
 ## 📱 Features
 
 ### Web2 Features
+
 - User profiles with avatars
 - Create and share posts
 - Like and comment on content
@@ -140,6 +185,7 @@ npm start
 - Responsive design
 
 ### Web3 Features
+
 - MetaMask wallet connection
 - On-chain token rewards ($YAP)
 - Transparent reward tracking
@@ -149,6 +195,7 @@ npm start
 ## 🌐 Network Configuration
 
 ### HeLa Testnet
+
 - **RPC URL**: https://testnet-rpc.helachain.com
 - **Chain ID**: 666888
 - **Currency**: HELA
@@ -159,12 +206,14 @@ Add to MetaMask manually or visit the HeLa documentation for automatic setup.
 ## 🛠️ Tech Stack
 
 **Blockchain**
+
 - Solidity 0.8.28
 - Hardhat 3
 - Viem
 - TypeScript
 
 **Backend**
+
 - Node.js
 - Express.js
 - MongoDB
@@ -172,6 +221,7 @@ Add to MetaMask manually or visit the HeLa documentation for automatic setup.
 - Cloudinary (media storage)
 
 **Frontend**
+
 - React.js
 - Material-UI
 - Redux

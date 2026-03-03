@@ -1,8 +1,22 @@
-import { Box, Typography, useTheme, IconButton, InputBase, Divider } from "@mui/material";
-import { DeleteOutline, EditOutlined, Save, Cancel, FavoriteBorder, Favorite } from "@mui/icons-material";
-import { useState } from "react";
-import FlexBetween from "./FlexBetween";
-import UserImage from "./UserImage";
+import {
+  Box,
+  Typography,
+  useTheme,
+  IconButton,
+  InputBase,
+  Divider,
+} from '@mui/material';
+import {
+  DeleteOutline,
+  EditOutlined,
+  Save,
+  Cancel,
+  FavoriteBorder,
+  Favorite,
+} from '@mui/icons-material';
+import { useState } from 'react';
+import FlexBetween from './FlexBetween';
+import UserImage from './UserImage';
 
 const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
   const { palette } = useTheme();
@@ -12,38 +26,43 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
   // Local state for editing mode
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(comment.comment);
-  
+
   // Local state for Like UI (Visual only)
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
 
   // --- HELPER: Calculate Relative Time ---
   const formatTimeAgo = (dateString) => {
-    if (!dateString) return "Just now";
-    
+    if (!dateString) return 'Just now';
+
     const date = new Date(dateString);
     const now = new Date();
     const seconds = Math.floor((now - date) / 1000);
 
     let interval = Math.floor(seconds / 31536000);
-    if (interval >= 1) return interval === 1 ? "1 year ago" : `${interval} years ago`;
+    if (interval >= 1)
+      return interval === 1 ? '1 year ago' : `${interval} years ago`;
 
     interval = Math.floor(seconds / 2592000);
-    if (interval >= 1) return interval === 1 ? "1 month ago" : `${interval} months ago`;
+    if (interval >= 1)
+      return interval === 1 ? '1 month ago' : `${interval} months ago`;
 
     interval = Math.floor(seconds / 86400);
-    if (interval >= 1) return interval === 1 ? "1 day ago" : `${interval} days ago`;
+    if (interval >= 1)
+      return interval === 1 ? '1 day ago' : `${interval} days ago`;
 
     interval = Math.floor(seconds / 3600);
-    if (interval >= 1) return interval === 1 ? "1 hr ago" : `${interval} hr ago`;
+    if (interval >= 1)
+      return interval === 1 ? '1 hr ago' : `${interval} hr ago`;
 
     interval = Math.floor(seconds / 60);
-    if (interval >= 1) return interval === 1 ? "1 min ago" : `${interval} min ago`;
+    if (interval >= 1)
+      return interval === 1 ? '1 min ago' : `${interval} min ago`;
 
     // Show seconds if less than 1 minute
     if (seconds < 60) return `${Math.max(0, seconds)} sec ago`;
 
-    return "Just now";
+    return 'Just now';
   };
 
   const handleLike = () => {
@@ -64,7 +83,7 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
   return (
     <Box>
       <Divider />
-      <FlexBetween sx={{ m: "0.5rem 0" }} alignItems="flex-start">
+      <FlexBetween sx={{ m: '0.5rem 0' }} alignItems="flex-start">
         <Box display="flex" gap="1rem" width="100%">
           {/* Avatar */}
           <UserImage image={comment.userPicturePath} size="35px" />
@@ -72,13 +91,13 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
           <Box width="100%">
             {/* Author Name & Timestamp */}
             <Box display="flex" alignItems="center" gap="0.5rem">
-                <Typography variant="h6" sx={{ color: main }}>
-                  {comment.firstName} {comment.lastName}
-                </Typography>
-                
-                <Typography variant="caption" sx={{ color: medium }}>
-                    {formatTimeAgo(comment.createdAt)}
-                </Typography>
+              <Typography variant="h6" sx={{ color: main }}>
+                {comment.firstName} {comment.lastName}
+              </Typography>
+
+              <Typography variant="caption" sx={{ color: medium }}>
+                {formatTimeAgo(comment.createdAt)}
+              </Typography>
             </Box>
 
             {/* Comment Text or Edit Input */}
@@ -89,10 +108,10 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
                   onChange={(e) => setEditText(e.target.value)}
                   sx={{
                     backgroundColor: palette.neutral.light,
-                    borderRadius: "1rem",
-                    padding: "0.2rem 1rem",
-                    width: "100%",
-                    mt: "0.5rem",
+                    borderRadius: '1rem',
+                    padding: '0.2rem 1rem',
+                    width: '100%',
+                    mt: '0.5rem',
                   }}
                   multiline
                 />
@@ -106,7 +125,7 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
                 </Box>
               </FlexBetween>
             ) : (
-              <Typography sx={{ color: medium, m: "0.5rem 0" }}>
+              <Typography sx={{ color: medium, m: '0.5rem 0' }}>
                 {comment.comment}
               </Typography>
             )}
@@ -115,25 +134,25 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
 
         {/* Actions (Like, Edit, Delete) */}
         <Box display="flex" flexDirection="column" alignItems="center">
-            <IconButton onClick={handleLike} size="small">
-                {isLiked ? (
-                    <Favorite fontSize="small" sx={{ color: palette.primary.main }} />
-                ) : (
-                    <FavoriteBorder fontSize="small" />
-                )}
-            </IconButton>
-            
-            {/* Edit/Delete Buttons (Only for Owner) */}
-            {comment.userId === loggedInUserId && !isEditing && (
-                <Box display="flex" mt="0.2rem">
-                <IconButton onClick={() => setIsEditing(true)} size="small">
-                    <EditOutlined fontSize="small" sx={{ color: medium }} />
-                </IconButton>
-                <IconButton onClick={() => onDelete(comment._id)} size="small">
-                    <DeleteOutline fontSize="small" sx={{ color: medium }} />
-                </IconButton>
-                </Box>
+          <IconButton onClick={handleLike} size="small">
+            {isLiked ? (
+              <Favorite fontSize="small" sx={{ color: palette.primary.main }} />
+            ) : (
+              <FavoriteBorder fontSize="small" />
             )}
+          </IconButton>
+
+          {/* Edit/Delete Buttons (Only for Owner) */}
+          {comment.userId === loggedInUserId && !isEditing && (
+            <Box display="flex" mt="0.2rem">
+              <IconButton onClick={() => setIsEditing(true)} size="small">
+                <EditOutlined fontSize="small" sx={{ color: medium }} />
+              </IconButton>
+              <IconButton onClick={() => onDelete(comment._id)} size="small">
+                <DeleteOutline fontSize="small" sx={{ color: medium }} />
+              </IconButton>
+            </Box>
+          )}
         </Box>
       </FlexBetween>
     </Box>

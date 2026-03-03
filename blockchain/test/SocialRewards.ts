@@ -144,4 +144,180 @@ describe("SocialRewards", async function () {
       assert.equal(stats[3], 3n); // postsUntilNextReward
     });
   });
+
+  describe("Token Metadata", async function () {
+    it("Should have correct name, symbol and decimals", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      const name = await socialRewards.read.name();
+      const symbol = await socialRewards.read.symbol();
+      const decimals = await socialRewards.read.decimals();
+
+      assert.equal(name, "Hela Social Token");
+      assert.equal(symbol, "HST");
+      assert.equal(decimals, 18);
+    });
+
+    it("Should assign entire initial supply to owner", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      const ownerBalance = await socialRewards.read.balanceOf([owner.account.address]);
+      const totalSupply = await socialRewards.read.totalSupply();
+
+      assert.equal(ownerBalance, totalSupply);
+    });
+  });
+
+  describe("Access Control", async function () {
+    it("Should not allow non-owner to register a user", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      await assert.rejects(
+        async () =>
+          await socialRewards.write.registerUser([user2.account.address], {
+            account: user1.account,
+          }),
+        /Not authorized/
+      );
+    });
+
+    it("Should not allow non-owner to record a post", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      await socialRewards.write.registerUser([user1.account.address]);
+
+      await assert.rejects(
+        async () =>
+          await socialRewards.write.recordPost([user1.account.address], {
+            account: user1.account,
+          }),
+        /Not authorized/
+      );
+    });
+  });
+
+  describe("Transfer Edge Cases", async function () {
+    it("Should fail transfer when balance is insufficient", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      await socialRewards.write.registerUser([user1.account.address]);
+
+      const tooMuch = 2n * 10n ** 18n; // user only has 1 token
+      await assert.rejects(
+        async () =>
+          await socialRewards.write.transfer([user2.account.address, tooMuch], {
+            account: user1.account,
+          }),
+        /Insufficient balance/
+      );
+    });
+
+    it("Should fail transfer to zero address", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      await socialRewards.write.registerUser([user1.account.address]);
+
+      await assert.rejects(
+        async () =>
+          await socialRewards.write.transfer(
+            ["0x0000000000000000000000000000000000000000", 1n],
+            { account: user1.account }
+          ),
+        /Invalid address/
+      );
+    });
+  });
+
+  describe("Transfer Ownership", async function () {
+    it("Should transfer ownership to a new owner", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      await socialRewards.write.transferOwnership([user1.account.address]);
+
+      const newOwner = await socialRewards.read.owner();
+      assert.equal(newOwner.toLowerCase(), user1.account.address.toLowerCase());
+    });
+
+    it("Should not allow non-owner to transfer ownership", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      await assert.rejects(
+        async () =>
+          await socialRewards.write.transferOwnership([user2.account.address], {
+            account: user1.account,
+          }),
+        /Not authorized/
+      );
+    });
+
+    it("Should not allow ownership transfer to zero address", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      await assert.rejects(
+        async () =>
+          await socialRewards.write.transferOwnership([
+            "0x0000000000000000000000000000000000000000",
+          ]),
+        /Invalid address/
+      );
+    });
+  });
+
+  describe("Reward Boundary Conditions", async function () {
+    it("Should not reward user at 9 posts", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      await socialRewards.write.registerUser([user1.account.address]);
+
+      for (let i = 0; i < 9; i++) {
+        await socialRewards.write.recordPost([user1.account.address]);
+      }
+
+      const balance = await socialRewards.read.balanceOf([user1.account.address]);
+      assert.equal(balance, 1n * 10n ** 18n); // only registration reward
+
+      const stats = await socialRewards.read.getUserStats([user1.account.address]);
+      assert.equal(stats[3], 1n); // 1 post until next reward
+    });
+
+    it("Should reward exactly at 10 posts and reset counter correctly", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      await socialRewards.write.registerUser([user1.account.address]);
+
+      for (let i = 0; i < 10; i++) {
+        await socialRewards.write.recordPost([user1.account.address]);
+      }
+
+      const balance = await socialRewards.read.balanceOf([user1.account.address]);
+      assert.equal(balance, 2n * 10n ** 18n); // registration + 1 post reward
+
+      const stats = await socialRewards.read.getUserStats([user1.account.address]);
+      assert.equal(stats[3], 10n); // counter reset: 10 posts until next reward
+    });
+
+    it("Should reduce owner balance by reward amount on registration", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      const ownerBefore = await socialRewards.read.balanceOf([owner.account.address]);
+      await socialRewards.write.registerUser([user1.account.address]);
+      const ownerAfter = await socialRewards.read.balanceOf([owner.account.address]);
+
+      assert.equal(ownerBefore - ownerAfter, 1n * 10n ** 18n);
+    });
+
+    it("Should reduce owner balance by reward amount after 10 posts", async function () {
+      const socialRewards = await viem.deployContract("SocialRewards");
+
+      await socialRewards.write.registerUser([user1.account.address]);
+      const ownerAfterReg = await socialRewards.read.balanceOf([owner.account.address]);
+
+      for (let i = 0; i < 10; i++) {
+        await socialRewards.write.recordPost([user1.account.address]);
+      }
+      const ownerAfterReward = await socialRewards.read.balanceOf([owner.account.address]);
+
+      assert.equal(ownerAfterReg - ownerAfterReward, 1n * 10n ** 18n);
+    });
+  });
 });

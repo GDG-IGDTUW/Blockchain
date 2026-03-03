@@ -4,17 +4,17 @@ import WidgetWrapper from 'components/WidgetWrapper';
 
 const AdvertWidget = () => {
   const { palette } = useTheme();
-  const dark = palette.neutral.dark;
-  const main = palette.neutral.main;
-  const medium = palette.neutral.medium;
+  const titleColor = palette.neutral.dark;
+  const primaryTextColor = palette.neutral.main;
+  const secondaryTextColor  = palette.neutral.medium;
 
   return (
     <WidgetWrapper>
       <FlexBetween>
-        <Typography color={dark} variant="h5" fontWeight="500">
+        <Typography color={titleColor} variant="h5" fontWeight="500">
           Sponsored
         </Typography>
-        <Typography color={medium}>Create Ad</Typography>
+        <Typography color={secondaryTextColor }>Create Ad</Typography>
       </FlexBetween>
       <img
         width="100%"
@@ -24,10 +24,10 @@ const AdvertWidget = () => {
         style={{ borderRadius: '0.75rem', margin: '0.75rem 0' }}
       />
       <FlexBetween>
-        <Typography color={main}>MikaCosmetics</Typography>
-        <Typography color={medium}>mikacosmetics.com</Typography>
+        <Typography color={primaryTextColor}>MikaCosmetics</Typography>
+        <Typography color={secondaryTextColor }>mikacosmetics.com</Typography>
       </FlexBetween>
-      <Typography color={medium} m="0.5rem 0">
+      <Typography color={secondaryTextColor } m="0.5rem 0">
         Your pathway to stunning and immaculate beauty and made sure your skin
         is exfoliating skin and shining like light.
       </Typography>

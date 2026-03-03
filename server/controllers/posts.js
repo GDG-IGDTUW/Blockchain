@@ -20,8 +20,8 @@ export const createPost = async (req, res) => {
     });
     await newPost.save();
 
-    const post = await Post.find();
-    res.status(201).json(post);
+    const posts = await Post.find();
+    res.status(201).json(posts);
   } catch (err) {
     res
       .status(500)
@@ -34,8 +34,8 @@ export const createPost = async (req, res) => {
 /* READ POSTS */
 export const getFeedPosts = async (req, res) => {
   try {
-    const post = await Post.find();
-    res.status(200).json(post);
+    const posts = await Post.find();
+    res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ msg: 'Could not load feed posts.' });
   }
@@ -44,8 +44,8 @@ export const getFeedPosts = async (req, res) => {
 export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
-    const post = await Post.find({ userId });
-    res.status(200).json(post);
+    const posts = await Post.find({ userId });
+    res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ msg: "Could not load this user's posts." });
   }

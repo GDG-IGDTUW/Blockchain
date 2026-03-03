@@ -38,41 +38,51 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   };
 
   return (
-    <FlexBetween>
-      <FlexBetween gap="1rem">
-        <UserImage image={userPicturePath} size="55px" />
+    <FlexBetween sx={{
+      p: '0.75rem',
+      borderRadius: '0.75rem',
+      transition: '0.2s',
+      '&:hover': {
+        backgroundColor: palette.neutral.light,
+      },
+    }}>
+      <FlexBetween gap="0.75rem">
+        <UserImage image={userPicturePath} size="48px" />
         <Box
           onClick={() => {
             navigate(`/profile/${friendId}`);
             navigate(0);
           }}
+          sx={{ cursor: 'pointer' }}
         >
           <Typography
-            color={main}
-            variant="h5"
-            fontWeight="500"
-            sx={{
-              '&:hover': {
-                color: palette.primary.light,
-                cursor: 'pointer',
-              },
-            }}
-          >
-            {name}
+           color={main}
+          fontSize="0.95rem"
+          fontWeight={600}
+          sx={{ lineHeight: 1.2 }}
+        >
+          {name}
           </Typography>
-          <Typography color={medium} fontSize="0.75rem">
+          <Typography color={medium} fontSize="0.75rem" sx={{ mt: '0.1rem' }}>
             {subtitle}
           </Typography>
         </Box>
       </FlexBetween>
       <IconButton
         onClick={() => patchFriend()}
-        sx={{ backgroundColor: primaryLight, p: '0.6rem' }}
+         sx={{
+        backgroundColor: primaryLight,
+        width: '34px',
+        height: '34px',
+        '&:hover': {
+          backgroundColor: palette.primary.main,
+        },
+      }}
       >
         {isFriend ? (
-          <PersonRemoveOutlined sx={{ color: primaryDark }} />
+          <PersonRemoveOutlined sx={{ fontSize: '18px', color: primaryDark }} />
         ) : (
-          <PersonAddOutlined sx={{ color: primaryDark }} />
+          <PersonAddOutlined sx={{ fontSize: '18px', color: primaryDark }} />
         )}
       </IconButton>
     </FlexBetween>

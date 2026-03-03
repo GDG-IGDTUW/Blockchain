@@ -122,16 +122,22 @@ const Navbar = () => {
         {/* --- SEARCH BAR SECTION --- */}
         {isNonMobileScreens && (
           <Box position="relative">
-            <FlexBetween
-              backgroundColor={neutralLight}
-              borderRadius="9px"
-              gap="3rem"
-              padding="0.1rem 1.5rem"
-            >
+           <FlexBetween
+  backgroundColor={neutralLight}
+  borderRadius="999px"
+  gap="1rem"
+  padding="0.35rem 1rem"
+  minWidth="300px"
+  boxShadow="inset 0 0 0 1px rgba(0,0,0,0.06)"
+>
               <InputBase
-                placeholder="Search users..."
+                placeholder="Search users or posts..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
+                 sx={{
+    flex: 1,
+    fontSize: '0.9rem',
+  }}
               />
               <IconButton onClick={() => handleSearch(searchQuery)}>
                 <Search />
@@ -141,28 +147,40 @@ const Navbar = () => {
             {/* --- SEARCH RESULTS DROPDOWN --- */}
             {searchResults.length > 0 && (
               <Box
-                position="absolute"
-                top="100%"
-                left="0"
-                zIndex="10"
-                width="100%"
-                backgroundColor={neutralLight}
-                borderRadius="0 0 9px 9px"
-                boxShadow="0px 4px 10px rgba(0,0,0,0.1)"
-                maxHeight="200px"
-                overflow="auto"
-              >
+  position="absolute"
+  top="110%"
+  left="0"
+  zIndex="20"
+  width="100%"
+  backgroundColor={alt}
+  borderRadius="12px"
+  boxShadow="0 12px 32px rgba(0,0,0,0.12)"
+  maxHeight="300px"
+  overflow="auto"
+  border={`1px solid ${neutralLight}`}
+>
+
                 <List dense>
                   {searchResults.map((item) => (
                     <ListItem
                       key={item._id}
                       button
+                      sx={{
+    borderRadius: '8px',
+    mx: '0.5rem',
+    my: '0.25rem',
+    '&:hover': {
+      backgroundColor: neutralLight,
+    },
+  }}
                       onClick={() => {
                         navigate(
                           item.type === 'user'
                             ? `/profile/${item._id}`
                             : `/post/${item._id}`
                         );
+                            setSearchResults([]);
+    setSearchQuery('');
                       }}
                     >
                       <ListItemText

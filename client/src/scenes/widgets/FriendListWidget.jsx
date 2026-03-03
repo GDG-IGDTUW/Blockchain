@@ -9,8 +9,7 @@ import { FriendListSkeleton } from "components/WidgetSkeleton";
 const FriendListWidget = ({ userId }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
-  const [isLoading, setIsLoading] = useState(true);
-  const token = useSelector((state) => state.token);
+  const authToken = useSelector((state) => state.token);
   const friends = useSelector((state) => state.user.friends);
 
   const getFriends = async () => {
@@ -19,8 +18,8 @@ const FriendListWidget = ({ userId }) => {
       `http://localhost:3001/users/${userId}/friends`,
       {
         method: 'GET',
-        headers: { Authorization: `Bearer ${token}` },
-      },
+        headers: { Authorization: `Bearer ${authToken}` },
+      }
     );
     const data = await response.json();
     dispatch(setFriends({ friends: data }));

@@ -4,11 +4,11 @@ import Post from '../models/Post.js';
 // Search users by name or username
 export const searchUsers = async (req, res) => {
   try {
-    const { q, page = 1, limit = 10 } = req.query;
-    const regex = new RegExp(q, 'i'); // case-insensitive
+    const { searchQuery , page = 1, limit = 10 } = req.query;
+    const searchRegex = new RegExp(searchQuery, 'i'); // case-insensitive
 
     const users = await User.find({
-      $or: [{ firstName: regex }, { lastName: regex }],
+      $or: [{ firstName: searchRegex }, { lastName: searchRegex }],
     })
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
@@ -23,11 +23,11 @@ export const searchUsers = async (req, res) => {
 // Search posts by content
 export const searchPosts = async (req, res) => {
   try {
-    const { q, page = 1, limit = 10 } = req.query;
+    const { searchQuery, page = 1, limit = 10 } = req.query;
 
-    const regex = new RegExp(q, 'i');
+    const searchRegex = new RegExp(searchQuery, 'i');
     // Text search on 'content' field
-    const posts = await Post.find({ description: regex })
+    const posts = await Post.find({ description: searchRegex })
       .populate('userId', 'firstName lastName')
       .skip((page - 1) * limit)
       .limit(parseInt(limit));
@@ -58,13 +58,13 @@ export const searchHashtags = async (req, res) => {
 // controllers/searchController.js
 export const searchAll = async (req, res) => {
   try {
-    const { q, page = 1, limit = 10 } = req.query;
-    if (!q || q.trim() === '') return res.json({ users: [], posts: [] });
+    const { searchQuery, page = 1, limit = 10 } = req.query;
+    if (!searchQuery || searchQuery.trim() === '') return res.json({ users: [], posts: [] });
 
-    const regex = new RegExp(q, 'i');
+    const searchRegex = new RegExp(searchQuery, 'i');
 
     const users = await User.find({
-      $or: [{ firstName: regex }, { lastName: regex }],
+      $or: [{ firstName: searchRegex }, { lastName: searchRegex }],
     }).limit(parseInt(limit));
 
     const posts = await Post.find({ description: regex })

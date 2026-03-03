@@ -1,7 +1,7 @@
-import { buildModule } from "@nomicfoundation/hardhat-ignition/modules";
+import { buildModule } from '@nomicfoundation/hardhat-ignition/modules';
 
-const SocialRewardsModule = buildModule("SocialRewardsModule", (m) => {
-  const socialRewards = m.contract("SocialRewards");
+const SocialRewardsModule = buildModule('SocialRewardsModule', (m) => {
+  const socialRewards = m.contract('SocialRewards');
 
   return { socialRewards };
 });

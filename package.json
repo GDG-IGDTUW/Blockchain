@@ -1,5 +1,19 @@
 {
   "dependencies": {
     "react-scripts": "5.0.1"
-  }
+  },
+  "name": "blockchain",
+  "description": "CIRCLE is a next-generation SocialFi platform built on the EVM-compatible HeLa blockchain, designed to merge the familiarity of Web2 social media with the ownership, incentives, and transparency of Web3.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {
+    "prettier": "^3.8.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

@@ -1,21 +1,21 @@
-import jwt from "jsonwebtoken";
+import jwt from 'jsonwebtoken';
 
 export const verifyToken = async (req, res, next) => {
   try {
-    let token = req.header("Authorization");
+    let authorizationHeader = req.header('Authorization');
 
-    if (!token) {
-      return res.status(401).json({ msg: "Authorization is required." });
+    if (!authorizationHeader) {
+      return res.status(401).json({ msg: 'Authorization is required.' });
     }
 
-    if (token.startsWith("Bearer ")) {
-      token = token.slice(7, token.length).trimLeft();
+    if (authorizationHeader.startsWith('Bearer ')) {
+      authorizationHeader = authorizationHeader.slice(7, authorizationHeader.length).trimLeft();
     }
 
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = verified;
+    const decodedToken = jwt.verify(authorizationHeader, process.env.JWT_SECRET);
+    req.user = decodedToken;
     next();
   } catch (err) {
-    res.status(401).json({ msg: "Invalid or expired authorization token." });
+    res.status(401).json({ msg: 'Invalid or expired authorization token.' });
   }
 };

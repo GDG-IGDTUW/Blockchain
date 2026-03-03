@@ -1,4 +1,4 @@
-import User from "../models/User.js";
+import User from '../models/User.js';
 
 /* READ */
 export const getUser = async (req, res) => {
@@ -7,7 +7,7 @@ export const getUser = async (req, res) => {
     const user = await User.findById(id);
     res.status(200).json(user);
   } catch (err) {
-    res.status(500).json({ msg: "Could not load user profile." });
+    res.status(500).json({ msg: 'Could not load user profile.' });
   }
 };
 
@@ -17,7 +17,7 @@ export const getUserFriends = async (req, res) => {
     const user = await User.findById(id);
 
     const friends = await Promise.all(
-      user.friends.map((id) => User.findById(id))
+      user.friends.map((friendId) => User.findById(friendId))
     );
     const formattedFriends = friends.map(
       ({ _id, firstName, lastName, occupation, location, picturePath }) => {
@@ -34,7 +34,7 @@ export const getUserFriends = async (req, res) => {
 export const getUserBySearch = async (req, res) => {
   try {
     const { query } = req.params;
-    
+
     // If the query is empty, return an empty array
     if (!query) return res.status(200).json([]);
 
@@ -43,8 +43,8 @@ export const getUserBySearch = async (req, res) => {
     // $options: "i" -> makes it Case Insensitive (e.g., "Vivek" matches "vivek")
     const users = await User.find({
       $or: [
-        { firstName: { $regex: query, $options: "i" } },
-        { lastName: { $regex: query, $options: "i" } },
+        { firstName: { $regex: query, $options: 'i' } },
+        { lastName: { $regex: query, $options: 'i' } },
       ],
     });
 
@@ -82,6 +82,6 @@ export const addRemoveFriend = async (req, res) => {
 
     res.status(200).json(formattedFriends);
   } catch (err) {
-    res.status(500).json({ msg: "Could not update friends list." });
+    res.status(500).json({ msg: 'Could not update friends list.' });
   }
 };

@@ -1,6 +1,6 @@
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import User from "../models/User.js";
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import User from '../models/User.js';
 
 /* REGISTER USER */
 export const register = async (req, res) => {
@@ -14,15 +14,15 @@ export const register = async (req, res) => {
       location,
       occupation,
     } = req.body;
- const picturePath = req.file ? req.file.filename : "";
+    const picturePath = req.file ? req.file.filename : '';
     const salt = await bcrypt.genSalt();
-    const passwordHash = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new User({
       firstName,
       lastName,
       email,
-      password: passwordHash,
+      password: hashedPassword  ,
       picturePath,
       friends,
       location,
@@ -33,9 +33,9 @@ export const register = async (req, res) => {
     const savedUser = await newUser.save();
     res.status(201).json(savedUser);
   } catch (err) {
-  console.error("REGISTER ERROR:", err);
-  res.status(500).json({ msg: "Registration failed", error: err.message });
-}
+    console.error('REGISTER ERROR:', err);
+    res.status(500).json({ msg: 'Registration failed', error: err.message });
+  }
 };
 
 /* LOGGING IN */
@@ -43,15 +43,17 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email: email });
-    if (!user) return res.status(401).json({ msg: "Invalid email or password." });
+    if (!user)
+      return res.status(401).json({ msg: 'Invalid email or password.' });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ msg: "Invalid email or password." });
+    const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    if (!isPasswordCorrect)
+      return res.status(401).json({ msg: 'Invalid email or password.' });
 
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
     delete user.password;
     res.status(200).json({ token, user });
   } catch (err) {
-    res.status(500).json({ msg: "Login failed due to a server error." });
+    res.status(500).json({ msg: 'Login failed due to a server error.' });
   }
 };

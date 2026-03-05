@@ -1,11 +1,11 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const postSchema = mongoose.Schema(
   {
     userId: {
-        type: mongoose.Schema.Types.ObjectId,
-  ref: "User",
-  required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
     },
     firstName: {
       type: String,
@@ -32,8 +32,8 @@ const postSchema = mongoose.Schema(
   { timestamps: true }
 );
 
-postSchema.index({ description: "text"  });
+postSchema.index({ description: 'text' });
 
-const Post = mongoose.model("Post", postSchema);
+const Post = mongoose.model('Post', postSchema);
 
 export default Post;

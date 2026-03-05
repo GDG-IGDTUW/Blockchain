@@ -1,6 +1,6 @@
-import Post from "../models/Post.js";
-import User from "../models/User.js";
-import mongoose from "mongoose";
+import Post from '../models/Post.js';
+import User from '../models/User.js';
+import mongoose from 'mongoose';
 
 /* CREATE POST */
 export const createPost = async (req, res) => {
@@ -20,30 +20,34 @@ export const createPost = async (req, res) => {
     });
     await newPost.save();
 
-    const post = await Post.find();
-    res.status(201).json(post);
+    const posts = await Post.find();
+    res.status(201).json(posts);
   } catch (err) {
-    res.status(500).json({ msg: "Post could not be created. Please check your input and try again." });
+    res
+      .status(500)
+      .json({
+        msg: 'Post could not be created. Please check your input and try again.',
+      });
   }
 };
 
 /* READ POSTS */
 export const getFeedPosts = async (req, res) => {
   try {
-    const post = await Post.find();
-    res.status(200).json(post);
+    const posts = await Post.find();
+    res.status(200).json(posts);
   } catch (err) {
-    res.status(500).json({  msg: "Could not load feed posts." });
+    res.status(500).json({ msg: 'Could not load feed posts.' });
   }
 };
 
 export const getUserPosts = async (req, res) => {
   try {
     const { userId } = req.params;
-    const post = await Post.find({ userId });
-    res.status(200).json(post);
+    const posts = await Post.find({ userId });
+    res.status(200).json(posts);
   } catch (err) {
-    res.status(500).json({  msg: "Could not load this user's posts." });
+    res.status(500).json({ msg: "Could not load this user's posts." });
   }
 };
 
@@ -69,7 +73,7 @@ export const likePost = async (req, res) => {
 
     res.status(200).json(updatedPost);
   } catch (err) {
-    res.status(500).json({  msg: "Could not update post like status." });
+    res.status(500).json({ msg: 'Could not update post like status.' });
   }
 };
 
@@ -80,9 +84,9 @@ export const postComment = async (req, res) => {
   try {
     const { id } = req.params;
     const { userId, comment } = req.body;
-    
+
     // Debug Log
-    console.log("BACKEND RECEIVED COMMENT:", { userId, commentText: comment });
+    console.log('BACKEND RECEIVED COMMENT:', { userId, commentText: comment });
 
     const post = await Post.findById(id);
     const user = await User.findById(userId);
@@ -93,9 +97,9 @@ export const postComment = async (req, res) => {
       firstName: user.firstName,
       lastName: user.lastName,
       userPicturePath: user.picturePath,
-      comment, 
+      comment,
       createdAt: new Date().toISOString(), // Add Timestamp
-      likes: [] 
+      likes: [],
     };
 
     post.comments.push(newComment);
@@ -119,14 +123,16 @@ export const deleteComment = async (req, res) => {
     const post = await Post.findById(id);
 
     // Filter out the comment by ID
-    post.comments = post.comments.filter((item) => String(item._id) !== commentId);
+    post.comments = post.comments.filter(
+      (item) => String(item._id) !== commentId
+    );
 
     const updatedPost = await Post.findByIdAndUpdate(
-        id,
-        { comments: post.comments },
-        { new: true }
+      id,
+      { comments: post.comments },
+      { new: true }
     );
-    
+
     res.status(200).json(updatedPost);
   } catch (err) {
     res.status(404).json({ message: err.message });
@@ -150,16 +156,16 @@ export const editComment = async (req, res) => {
 
     if (commentIndex > -1) {
       post.comments[commentIndex].comment = comment; // Update Text
-      
+
       // Mark as modified so Mongoose knows to save the array change
-      post.markModified('comments'); 
+      post.markModified('comments');
 
       await post.save();
 
       const updatedPost = await Post.findById(id);
       res.status(200).json(updatedPost);
     } else {
-      res.status(404).json({ message: "Comment not found" });
+      res.status(404).json({ message: 'Comment not found' });
     }
   } catch (err) {
     res.status(404).json({ message: err.message });

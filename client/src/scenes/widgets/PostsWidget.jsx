@@ -36,12 +36,8 @@ const PostsWidget = ({ userId, isProfile = false }) => {
     );
     const data = await response.json();
     dispatch(setPosts({ posts: data }));
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoading(false);
-  }
-};
+  } 
+
 
 
   useEffect(() => {

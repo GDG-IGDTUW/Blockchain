@@ -6,12 +6,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { setFriends } from "state";
 import { FriendListSkeleton } from "components/WidgetSkeleton";
 
+
 const FriendListWidget = ({ userId }) => {
   const dispatch = useDispatch();
   const { palette } = useTheme();
   const authToken = useSelector((state) => state.token);
   const friends = useSelector((state) => state.user.friends);
-
+  const [isLoading, setIsLoading] = useState(true);
   const getFriends = async () => {
     setIsLoading(true);
     const response = await fetch(

@@ -42,7 +42,7 @@ function App() {
             />
             <Route
               path="*"
-              element={<NotFoundPage />}
+              element={<NotFound />}
             />
           </Routes>
         </ThemeProvider>

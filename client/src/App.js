@@ -40,6 +40,10 @@ function App() {
               path="/profile/settings/:userId"
               element={isAuth ? <ProfileSettings /> : <Navigate to="/" />}
             />
+            <Route
+              path="*"
+              element={<NotFound />}
+            />
           </Routes>
         </ThemeProvider>
       </BrowserRouter>

@@ -1,4 +1,8 @@
-import { useState } from 'react';
+import { useState } from "react";
+
+import { ethers } from "ethers";
+import Loader from "components/Loader";
+
 import {
   Box,
   IconButton,
@@ -22,11 +26,12 @@ import {
   Help,
   Menu,
   Close,
-} from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { setMode, setLogout } from 'state';
-import { useNavigate } from 'react-router-dom';
-import FlexBetween from 'components/FlexBetween';
+} from "@mui/icons-material";
+import { useDispatch, useSelector } from "react-redux";
+import { setMode, setLogout } from "state";
+import { useNavigate } from "react-router-dom";
+import FlexBetween from "components/FlexBetween";
+import WalletConnect from "components/WalletConnect";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -34,7 +39,6 @@ const Navbar = () => {
   // --- SEARCH STATES ---
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [searchError, setSearchError] = useState('');
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -89,8 +93,7 @@ const Navbar = () => {
         ...data.posts.map((p) => ({ ...p, type: 'post' })),
       ]);
     } catch (err) {
-      setSearchResults([]);
-      setSearchError(err.message || 'Unable to search. Check your connection.');
+      console.error(err);
     }
   };
 
@@ -206,6 +209,24 @@ const Navbar = () => {
       {/* DESKTOP NAV */}
       {isNonMobileScreens ? (
         <FlexBetween gap="2rem">
+          {walletLoading ? (
+  <Loader />
+) : (
+  <Typography
+    onClick={!walletLoading ? connectWallet : undefined}
+    sx={{
+      cursor: "pointer",
+      color: "primary.main",
+      fontWeight: 500,
+      "&:hover": { opacity: 0.8 },
+    }}
+  >
+    {walletAddress
+      ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+      : "Connect Wallet"}
+  </Typography>
+)}
+
           <IconButton onClick={() => dispatch(setMode())}>
             {theme.palette.mode === 'dark' ? (
               <DarkMode sx={{ fontSize: '25px' }} />
@@ -213,9 +234,10 @@ const Navbar = () => {
               <LightMode sx={{ color: dark, fontSize: '25px' }} />
             )}
           </IconButton>
-          <Message sx={{ fontSize: '25px' }} />
-          <Notifications sx={{ fontSize: '25px' }} />
-          <Help sx={{ fontSize: '25px' }} />
+          <Message sx={{ fontSize: "25px" }} />
+          <Notifications sx={{ fontSize: "25px" }} />
+          <Help sx={{ fontSize: "25px" }} />
+          <WalletConnect />
           <FormControl variant="standard" value={fullName}>
             <Select
               value={fullName}
@@ -278,6 +300,23 @@ const Navbar = () => {
             alignItems="center"
             gap="3rem"
           >
+            {walletLoading ? (
+  <Loader />
+) : (
+  <Typography
+    onClick={!walletLoading ? connectWallet : undefined}
+    sx={{
+      cursor: "pointer",
+      color: "primary.main",
+      fontWeight: 500,
+    }}
+  >
+    {walletAddress
+      ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+      : "Connect Wallet"}
+  </Typography>
+)}
+
             <IconButton
               onClick={() => dispatch(setMode())}
               sx={{ fontSize: '25px' }}
@@ -288,9 +327,10 @@ const Navbar = () => {
                 <LightMode sx={{ color: dark, fontSize: '25px' }} />
               )}
             </IconButton>
-            <Message sx={{ fontSize: '25px' }} />
-            <Notifications sx={{ fontSize: '25px' }} />
-            <Help sx={{ fontSize: '25px' }} />
+            <Message sx={{ fontSize: "25px" }} />
+            <Notifications sx={{ fontSize: "25px" }} />
+            <Help sx={{ fontSize: "25px" }} />
+            <WalletConnect />
             <FormControl variant="standard" value={fullName}>
               <Select
                 value={fullName}

@@ -16,6 +16,7 @@ import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import postRoutes from './routes/posts.js';
 import searchRoutes from './routes/search.js';
+import profileRoutes from "./routes/profile.js";
 
 /* Controller imports */
 import { register } from './controllers/auth.js';
@@ -79,7 +80,7 @@ app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/posts', postRoutes);
 app.use('/search', searchRoutes);
-
+app.use("/api/profile", profileRoutes);
 
 /* DATABASE CONNECTION 
 

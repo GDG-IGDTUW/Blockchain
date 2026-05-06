@@ -38,6 +38,29 @@ const UserSchema = new mongoose.Schema(
       type: Array,
       default: [],
     },
+    bio: {
+  type: String,
+  default: "",
+},
+avatar: {
+  type: String,
+  default: "",
+},
+socialLinks: {
+  twitter: String,
+  linkedin: String,
+  github: String,
+},
+followers: [
+  {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+],
+tokens: {
+  type: Number,
+  default: 0,
+},
     location: String,
     occupation: String,
     viewedProfile: Number,

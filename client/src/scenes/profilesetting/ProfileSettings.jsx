@@ -32,7 +32,7 @@ const ProfileSettings = () => {
     setLoading(true);
     setServerError('');
     try {
-      const response = await fetch(`http://localhost:3001/users/${userId}`, {
+      const response = await fetch(`http://localhost:3001/api/profile/${userId}`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -97,8 +97,8 @@ setSuccess('');
     try {
       setLoading(true);
 
-      const response = await fetch(`http://localhost:3001/users/${userId}`, {
-        method: 'PATCH',
+      const response = await fetch(`http://localhost:3001/api/profile/update/${userId}`, {
+        method: "PUT",
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,

@@ -39,7 +39,9 @@ const Navbar = () => {
   // --- SEARCH STATES ---
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-
+  const [searchError, setSearchError] = useState("");
+  const [walletLoading, setWalletLoading] = useState(false);
+  const [walletAddress, setWalletAddress] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
@@ -96,6 +98,27 @@ const Navbar = () => {
       console.error(err);
     }
   };
+
+  const connectWallet = async () => {
+  try {
+    setWalletLoading(true);
+
+    if (window.ethereum) {
+      const accounts = await window.ethereum.request({
+        method: "eth_requestAccounts",
+      });
+
+      setWalletAddress(accounts[0]);
+    } else {
+      setSearchError("MetaMask not detected");
+    }
+  } catch (error) {
+    console.error(error);
+    setSearchError("Wallet connection failed");
+  } finally {
+    setWalletLoading(false);
+  }
+};
 
   return (
     <FlexBetween padding="1rem 6%" backgroundColor={alt} position="relative">

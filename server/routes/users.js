@@ -8,6 +8,8 @@ import {
   getUserBySearch, // <--- Imported the new search controller
 } from '../controllers/users.js';
 import { verifyToken } from '../middleware/auth.js';
+import { userIdValidator } from '../validators/userValidator.js';
+import validate from '../middleware/validate.js';
 
 const router = express.Router();
 

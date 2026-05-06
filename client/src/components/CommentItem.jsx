@@ -26,6 +26,8 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
   // Local state for editing mode
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(comment.comment);
+  const [localError, setLocalError] = useState("");
+
 
   // Local state for Like UI (Visual only)
   const [isLiked, setIsLiked] = useState(false);

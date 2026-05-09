@@ -4,11 +4,17 @@ import {
   TextField,
   Typography,
   useMediaQuery,
+  CircularProgress,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Navbar from 'scenes/navbar';
+import {
+  showSuccess,
+  showError,
+  showWarning
+} from "../../utils/toast";
 
 const ProfileSettings = () => {
   const { userId } = useParams();
@@ -23,27 +29,25 @@ const ProfileSettings = () => {
 
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+    const [serverError, setServerError] = useState('');
+  const [success, setSuccess] = useState('');
 
   // Fetch user data (same style as ProfilePage)
   const getUser = async () => {
+    setLoading(true);
+    setServerError('');
     try {
-      const response = await fetch(`http://localhost:3001/users/${userId}`, {
+      const response = await fetch(`http://localhost:3001/api/profile/${userId}`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          alert('You are not logged in.');
-          return;
-        }
-
-        if (response.status === 403) {
-          alert('You do not have permission to view this profile.');
-          return;
-        }
-        alert('Could not load your profile settings.');
-        return;
+        if (response.status === 401)
+          throw new Error('Your session has expired. Please login again.');
+        if (response.status === 403)
+          throw new Error('You are not allowed to edit this profile.');
+        throw new Error('Failed to load profile settings.');
       }
 
       const data = await response.json();
@@ -54,16 +58,20 @@ const ProfileSettings = () => {
         bio: data.bio || '',
       });
     } catch (err) {
-      alert('Network error while loading your profile settings.');
+      setServerError(err.message);
+    }finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     getUser();
-  }, []); // eslint-disable-line
+  }, [userId]); // eslint-disable-line
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setErrors({});
+    setSuccess('');
   };
 
   const validate = () => {
@@ -74,7 +82,7 @@ const ProfileSettings = () => {
     if (!form.email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(form.email)) {
-      newErrors.email = 'Invalid email format';
+      newErrors.email = 'Please enter a valid email address';
     }
 
     return newErrors;
@@ -82,18 +90,21 @@ const ProfileSettings = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+setSuccess('');
+    setServerError('');
 
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      showWarning("Please fix validation errors.");
       return;
     }
 
     try {
       setLoading(true);
 
-      const response = await fetch(`http://localhost:3001/users/${userId}`, {
-        method: 'PATCH',
+      const response = await fetch(`http://localhost:3001/api/profile/update/${userId}`, {
+        method: "PUT",
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -102,21 +113,18 @@ const ProfileSettings = () => {
       });
 
       if (!response.ok) {
-        if (response.status === 401) {
-          alert('You are not logged in.');
-          return;
-        }
-        if (response.status === 403) {
-          alert('You do not have permission to update this profile.');
-          return;
-        }
-        alert('Profile update failed.');
-        return;
+        if (response.status === 401)
+          throw new Error('Your session has expired. Please login again.');
+        if (response.status === 403)
+          throw new Error('You are not allowed to update this profile.');
+        throw new Error('Profile update failed. Please try again.');
       }
 
-      alert('Profile updated successfully!');
+      setSuccess('Your profile has been updated successfully.');
+      showSuccess("Profile updated successfully!");
     } catch (err) {
-      alert('Network error while saving changes.');
+      setServerError(err.message);
+      showError(err.message);
     } finally {
       setLoading(false);
     }
@@ -141,6 +149,20 @@ const ProfileSettings = () => {
           <Typography variant="h4" fontWeight="500" mb="1.5rem">
             Profile Settings
           </Typography>
+
+          {loading && <CircularProgress />}
+
+          {serverError && (
+            <Typography color="error" mb="1rem">
+              {serverError}
+            </Typography>
+          )}
+
+          {success && (
+            <Typography color="success.main" mb="1rem">
+              {success}
+            </Typography>
+          )}
 
           <form onSubmit={handleSubmit}>
             <Box display="flex" flexDirection="column" gap="1.5rem">

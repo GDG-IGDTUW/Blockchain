@@ -1,4 +1,4 @@
-import { Box, Button, useMediaQuery } from '@mui/material';
+import { Box, Button, useMediaQuery,Typography, CircularProgress } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -7,50 +7,78 @@ import FriendListWidget from 'scenes/widgets/FriendListWidget';
 import MyPostWidget from 'scenes/widgets/MyPostWidget';
 import PostsWidget from 'scenes/widgets/PostsWidget';
 import UserWidget from 'scenes/widgets/UserWidget';
+import { showError } from "../../utils/toast";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
   const { userId } = useParams();
   const token = useSelector((state) => state.token);
   const isNonMobileScreens = useMediaQuery('(min-width:1000px)');
   const navigate = useNavigate();
 
   const getUser = async () => {
+     setLoading(true);
+    setError('');
+
     try {
       const response = await fetch(`http://localhost:3001/users/${userId}`, {
         method: 'GET',
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!response.ok) {
+     if (!response.ok) {
         if (response.status === 401) {
-          alert('You are not logged in. Please log in again.');
-          return;
+          throw new Error('Your session has expired. Please login again.');
         }
         if (response.status === 404) {
-          alert('User not found.');
-          return;
+          throw new Error('This user profile does not exist.');
         }
         if (response.status === 403) {
-          alert('You do not have permission to view this profile.');
-          return;
+          throw new Error('You do not have permission to view this profile.');
         }
-        alert('Could not load this profile. Please try again later.');
-        return;
+        throw new Error('Unable to load this profile. Please try again later.');
       }
 
       const data = await response.json();
       setUser(data);
     } catch (err) {
-      alert('Network error while loading this profile. Please try again.');
+      setError(err.message || 'Network error. Please try again.');
+      showError(err.message || 'Network error. Please try again.');
+    }finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     getUser();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [userId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!user) return null;
+   if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" mt="4rem">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  // 🔴 Error UI
+  if (error) {
+    return (
+      <Box textAlign="center" mt="5rem">
+        <Typography color="error" mb="1rem">
+          {error}
+        </Typography>
+        <Button variant="contained" onClick={getUser}>
+          Retry
+        </Button>
+        <Button sx={{ ml: '1rem' }} onClick={() => navigate('/home')}>
+          Go Home
+        </Button>
+      </Box>
+    );
+  }
 
   return (
     <Box>

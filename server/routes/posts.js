@@ -1,3 +1,5 @@
+// Contains all routes related to posts, likes and comments.
+
 import express from 'express';
 import {
   getFeedPosts,
@@ -11,18 +13,23 @@ import { verifyToken } from '../middleware/auth.js';
 
 const router = express.Router();
 
-/* READ */
+// Fetch all posts for user feed
 router.get('/', verifyToken, getFeedPosts);
+
+// Fetch all posts created by a specific user
 router.get('/:userId/posts', verifyToken, getUserPosts);
 
-/* UPDATE */
+// Like or unlike a post & Updates likes array inside Post document
 router.patch('/:id/like', verifyToken, likePost);
+
+// Add a comment to a post
 router.post('/:id/comment', verifyToken, postComment);
 
 // 👇 2. YEH LINE SABSE ZAROORI HAI. AGAR YEH NAHI HAI TOH 404 AAYEGA.
+//  Edit an existing comment
 router.patch('/:id/:commentId/edit', verifyToken, editComment);
 
-/* DELETE */
+// Delete a comment from a post
 router.delete('/:id/:commentId/delete', verifyToken, deleteComment);
 
 export default router;

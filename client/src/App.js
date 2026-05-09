@@ -10,12 +10,16 @@ import { themeSettings } from './theme';
 import ProfileSettings from 'scenes/profilesetting/ProfileSettings';
 import PostPage from 'scenes/postPage';
 import NotFound from './pages/NotFound';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 function App() {
   const mode = useSelector((state) => state.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
   const isAuth = Boolean(useSelector((state) => state.token));
 
+  
   return (
     <div className="app">
       <BrowserRouter>
@@ -45,6 +49,18 @@ function App() {
               element={<NotFound />}
             />
           </Routes>
+          <ToastContainer
+            position="top-right"
+            autoClose={3500}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="dark"
+          />
         </ThemeProvider>
       </BrowserRouter>
     </div>

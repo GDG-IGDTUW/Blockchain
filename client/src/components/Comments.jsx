@@ -5,6 +5,12 @@ import CommentItem from './CommentItem'; // Import the new reusable component
 import { useSelector, useDispatch } from 'react-redux';
 import { setPost } from 'state';
 import { useState } from 'react';
+import {
+  showSuccess,
+  showError,
+  showInfo,
+  showWarning,
+} from "../utils/toast";
 
 const Comments = ({ postId, comments }) => {
   const [text, setText] = useState(''); // State for new comment input
@@ -28,13 +34,28 @@ const Comments = ({ postId, comments }) => {
           body: JSON.stringify({ userId: user._id, comment: text }),
         }
       );
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('You must be logged in to add a comment.');
+        }
+        if (response.status === 400) {
+          throw new Error('Comment cannot be empty.');
+        }
+        if (response.status === 500) {
+          throw new Error('Server error. Please try again later.');
+        }
+        throw new Error('Unable to post your comment.');
+      }
+
       const updatedPost = await response.json();
       dispatch(setPost({ post: updatedPost }));
       setText(''); // Clear the input field
+      showSuccess("Comment added successfully!");
     } catch (error) {
-      console.error('Error adding comment:', error);
+        showError(error.message);
     }
-  };
+  };  
 
   // 2. DELETE COMMENT FUNCTION
   const handleDeleteComment = async (commentId) => {
@@ -49,10 +70,21 @@ const Comments = ({ postId, comments }) => {
           },
         }
       );
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('You are not authorized to delete this comment.');
+        }
+        if (response.status === 404) {
+          throw new Error('Comment not found.');
+        }
+        throw new Error('Unable to delete the comment.');
+      }
+
       const updatedPost = await response.json();
       dispatch(setPost({ post: updatedPost }));
+      showWarning("Comment deleted.");
     } catch (error) {
-      console.error('Error deleting comment:', error);
+        showError(error.message);
     }
   };
 
@@ -71,15 +103,24 @@ const Comments = ({ postId, comments }) => {
         }
       );
 
-      if (!response.ok) {
-        throw new Error('Failed to save comment. Status: ' + response.status);
+       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('You are not allowed to edit this comment.');
+        }
+        if (response.status === 400) {
+          throw new Error('Comment cannot be empty.');
+        }
+        if (response.status === 404) {
+          throw new Error('This comment no longer exists.');
+        }
+        throw new Error('Failed to save your comment.');
       }
 
       const updatedPost = await response.json();
       dispatch(setPost({ post: updatedPost }));
-      console.log('Comment updated successfully!');
+      showInfo("Comment updated successfully!");
     } catch (error) {
-      console.error('Error saving edit:', error);
+        showError(error.message);
     }
   };
 

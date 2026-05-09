@@ -1,3 +1,6 @@
+/* Defines the MongoDB schema for social media posts.
+Each Post belongs to a user and may contain likes and comments.  */
+
 import mongoose from 'mongoose';
 
 const postSchema = mongoose.Schema(
@@ -17,7 +20,11 @@ const postSchema = mongoose.Schema(
     },
     location: String,
     description: String,
+
+    //  Image uploaded with the post
     picturePath: String,
+
+    // User profile picture shown on post
     userPicturePath: String,
     likes: {
       type: Map,
@@ -29,7 +36,7 @@ const postSchema = mongoose.Schema(
       default: [],
     },
   },
-  { timestamps: true }
+  { timestamps: true }    // Automatically adds createdAt & updatedAt
 );
 
 postSchema.index({ description: 'text' });

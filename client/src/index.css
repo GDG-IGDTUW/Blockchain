@@ -31,3 +31,37 @@ body {
   background: var(--bg);
   color: var(--text);
 }
+@media (max-width: 1024px) {
+  .container {
+    padding: 0 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .row {
+    flex-direction: column;
+  }
+
+  .card {
+    width: 100% !important;
+    margin-bottom: 16px;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  h1 {
+    font-size: 1.4rem;
+  }
+
+  button {
+    width: 100%;
+  }
+}

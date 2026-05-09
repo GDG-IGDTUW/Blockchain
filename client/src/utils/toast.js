@@ -1,17 +1,25 @@
 import { toast } from "react-toastify";
 
-export const showSuccess = (msg) => {
-  toast.success(msg);
+export const showSuccess = (message) => {
+  toast.success(message, {
+    autoClose: 3500,
+  });
 };
 
-export const showError = (msg) => {
-  toast.error(msg);
+export const showError = (message) => {
+  toast.error(message, {
+    autoClose: 4000,
+  });
 };
 
-export const showWarning = (msg) => {
-  toast.warning(msg);
+export const showWarning = (message) => {
+  toast.warning(message, {
+    autoClose: 3500,
+  });
 };
 
-export const showInfo = (msg) => {
-  toast.info(msg);
+export const showInfo = (message) => {
+  toast.info(message, {
+    autoClose: 3500,
+  });
 };

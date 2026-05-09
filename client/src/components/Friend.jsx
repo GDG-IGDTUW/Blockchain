@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { setFriends } from 'state';
 import FlexBetween from './FlexBetween';
 import UserImage from './UserImage';
+import { showSuccess, showError, showInfo } from "../utils/toast";
 
 const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
   const dispatch = useDispatch();
@@ -23,18 +24,31 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
     Array.isArray(friends) && friends.find((friend) => friend._id === friendId);
 
   const patchFriend = async () => {
-    const response = await fetch(
-      `http://localhost:3001/users/${_id}/${friendId}`,
-      {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+    try{
+      const response = await fetch(
+        `http://localhost:3001/users/${_id}/${friendId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Unable to update friend status.");
       }
-    );
-    const data = await response.json();
-    dispatch(setFriends({ friends: data }));
+
+      const data = await response.json();
+      dispatch(setFriends({ friends: data }));
+      if (isFriend) {
+        showInfo("Friend removed.");
+      } else {
+        showSuccess("Friend request accepted!");
+      }
+    } catch (error) {
+      showError(error.message);
+    }
   };
 
   return (

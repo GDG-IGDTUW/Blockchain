@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Navbar from "scenes/navbar";
 import PostWidget from "scenes/widgets/PostWidget";
 import { setPost } from "state";
+import { showError } from "../../utils/toast";
 
 const PostPage = () => {
   const { postId } = useParams();
@@ -47,6 +48,7 @@ const PostPage = () => {
     } catch (err) {
       if (err.name !== "AbortError") {
         setError(err.message);
+        showError(err.message);
       }
     } finally {
       setLoading(false);

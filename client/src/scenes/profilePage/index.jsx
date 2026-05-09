@@ -7,6 +7,7 @@ import FriendListWidget from 'scenes/widgets/FriendListWidget';
 import MyPostWidget from 'scenes/widgets/MyPostWidget';
 import PostsWidget from 'scenes/widgets/PostsWidget';
 import UserWidget from 'scenes/widgets/UserWidget';
+import { showError } from "../../utils/toast";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -44,6 +45,7 @@ const ProfilePage = () => {
       setUser(data);
     } catch (err) {
       setError(err.message || 'Network error. Please try again.');
+      showError(err.message || 'Network error. Please try again.');
     }finally {
       setLoading(false);
     }

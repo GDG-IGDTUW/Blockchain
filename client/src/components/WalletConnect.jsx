@@ -3,6 +3,7 @@ import { Button, Tooltip, Typography, Box } from "@mui/material";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
 import { useDispatch, useSelector } from "react-redux";
 import { setWallet, clearWallet } from "state";
+import { showSuccess, showError, showWarning , showInfo } from "../utils/toast";
 
 const HELA_TESTNET_CHAIN_ID = "0xA2F08"; // 666888 in hex
 
@@ -18,6 +19,7 @@ const WalletConnect = () => {
     const chainId = await window.ethereum.request({ method: "eth_chainId" });
     if (chainId !== HELA_TESTNET_CHAIN_ID) {
       setNetworkWarning(true);
+      showWarning("Please switch to HeLa Testnet.");
     } else {
       setNetworkWarning(false);
     }
@@ -25,7 +27,7 @@ const WalletConnect = () => {
 
   const connectWallet = async () => {
     if (!window.ethereum) {
-      alert("MetaMask is not installed. Please install it to use this feature.");
+      showError("MetaMask is not installed.");
       return;
     }
     try {
@@ -33,6 +35,7 @@ const WalletConnect = () => {
         method: "eth_requestAccounts",
       });
       dispatch(setWallet({ walletAddress: accounts[0] }));
+      showSuccess("Wallet connected successfully!");
       await checkNetwork();
 
       window.ethereum.on("accountsChanged", (accounts) => {
@@ -50,7 +53,7 @@ const WalletConnect = () => {
     } catch (err) {
       if (err.code === 4001) {
         // User rejected the request
-        console.log("User rejected wallet connection.");
+        showInfo("Wallet connection cancelled.");
       } else {
         console.error(err);
       }

@@ -5,6 +5,12 @@ import CommentItem from './CommentItem'; // Import the new reusable component
 import { useSelector, useDispatch } from 'react-redux';
 import { setPost } from 'state';
 import { useState } from 'react';
+import {
+  showSuccess,
+  showError,
+  showInfo,
+  showWarning,
+} from "../utils/toast";
 
 const Comments = ({ postId, comments }) => {
   const [text, setText] = useState(''); // State for new comment input
@@ -45,8 +51,9 @@ const Comments = ({ postId, comments }) => {
       const updatedPost = await response.json();
       dispatch(setPost({ post: updatedPost }));
       setText(''); // Clear the input field
+      showSuccess("Comment added successfully!");
     } catch (error) {
-      alert(error.message);
+        showError(error.message);
     }
   };  
 
@@ -75,8 +82,9 @@ const Comments = ({ postId, comments }) => {
 
       const updatedPost = await response.json();
       dispatch(setPost({ post: updatedPost }));
+      showWarning("Comment deleted.");
     } catch (error) {
-      alert(error.message);
+        showError(error.message);
     }
   };
 
@@ -110,9 +118,9 @@ const Comments = ({ postId, comments }) => {
 
       const updatedPost = await response.json();
       dispatch(setPost({ post: updatedPost }));
-      console.log('Comment updated successfully!');
+      showInfo("Comment updated successfully!");
     } catch (error) {
-      alert(error.message);
+        showError(error.message);
     }
   };
 

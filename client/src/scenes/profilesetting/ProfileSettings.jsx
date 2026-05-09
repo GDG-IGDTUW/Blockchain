@@ -10,6 +10,11 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Navbar from 'scenes/navbar';
+import {
+  showSuccess,
+  showError,
+  showWarning
+} from "../../utils/toast";
 
 const ProfileSettings = () => {
   const { userId } = useParams();
@@ -91,6 +96,7 @@ setSuccess('');
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+      showWarning("Please fix validation errors.");
       return;
     }
 
@@ -115,8 +121,10 @@ setSuccess('');
       }
 
       setSuccess('Your profile has been updated successfully.');
+      showSuccess("Profile updated successfully!");
     } catch (err) {
       setServerError(err.message);
+      showError(err.message);
     } finally {
       setLoading(false);
     }

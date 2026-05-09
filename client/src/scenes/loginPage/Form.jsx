@@ -15,6 +15,10 @@ import { useDispatch } from 'react-redux';
 import { setLogin } from 'state';
 import Dropzone from 'react-dropzone';
 import FlexBetween from 'components/FlexBetween';
+import {
+  showSuccess,
+  showError,
+} from "../../utils/toast";
 
 const registerSchema = yup.object().shape({
   firstName: yup.string().required('required'),
@@ -56,6 +60,7 @@ const Form = () => {
   const isRegister = pageType === 'register';
 
   const register = async (values, onSubmitProps) => {
+    try{
     // this allows us to send form info with image
     const formData = new FormData();
     for (let value in values) {
@@ -70,20 +75,35 @@ const Form = () => {
         body: formData,
       }
     );
+
+    if (!savedUserResponse.ok) {
+      throw new Error("Registration failed.");
+    }
+
     const savedUser = await savedUserResponse.json();
     onSubmitProps.resetForm();
 
     if (savedUser) {
+      showSuccess("Registration successful! Please login.");
       setPageType('login');
     }
+  }catch(error){
+    showError(error.message);
+  }
   };
 
   const login = async (values, onSubmitProps) => {
+    try{
     const loggedInResponse = await fetch('http://localhost:3001/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(values),
     });
+
+    if (!loggedInResponse.ok) {
+      throw new Error("Invalid email or password.");
+    }
+
     const loggedIn = await loggedInResponse.json();
     onSubmitProps.resetForm();
     if (loggedIn) {
@@ -93,7 +113,11 @@ const Form = () => {
           token: loggedIn.token,
         })
       );
+      showSuccess("Login successful!");
       navigate('/home');
+    }
+    } catch (error) {
+      showError(error.message);
     }
   };
 

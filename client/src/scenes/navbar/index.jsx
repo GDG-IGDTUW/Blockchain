@@ -32,6 +32,12 @@ import { setMode, setLogout } from "state";
 import { useNavigate } from "react-router-dom";
 import FlexBetween from "components/FlexBetween";
 import WalletConnect from "components/WalletConnect";
+import {
+  showSuccess,
+  showError,
+  showWarning,
+  showInfo,
+} from "../../utils/toast";
 
 const Navbar = () => {
   const [isMobileMenuToggled, setIsMobileMenuToggled] = useState(false);
@@ -88,6 +94,7 @@ const Navbar = () => {
       if (data.users.length === 0 && data.posts.length === 0) {
         setSearchResults([]);
         setSearchError('No users or posts found.');
+        showInfo("No users or posts found.");
         return;
       }
       setSearchResults([
@@ -95,7 +102,7 @@ const Navbar = () => {
         ...data.posts.map((p) => ({ ...p, type: 'post' })),
       ]);
     } catch (err) {
-      console.error(err);
+      showError(err.message);
     }
   };
 
@@ -109,12 +116,15 @@ const Navbar = () => {
       });
 
       setWalletAddress(accounts[0]);
+      showSuccess("Wallet connected successfully!");
     } else {
       setSearchError("MetaMask not detected");
+      showError("MetaMask not detected.");
     }
   } catch (error) {
     console.error(error);
     setSearchError("Wallet connection failed");
+    showError("Wallet connection failed.");
   } finally {
     setWalletLoading(false);
   }

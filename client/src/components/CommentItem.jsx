@@ -17,6 +17,7 @@ import {
 import { useState } from 'react';
 import FlexBetween from './FlexBetween';
 import UserImage from './UserImage';
+import { showSuccess, showInfo } from "../utils/toast";
 
 const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
   const { palette } = useTheme();
@@ -68,8 +69,15 @@ const CommentItem = ({ comment, loggedInUserId, onDelete, onEdit }) => {
   };
 
   const handleLike = () => {
+    if (isLiked) {
+      showInfo("Like removed.");
+      setLikeCount(likeCount - 1);
+    } else {
+      showSuccess("Comment liked!");
+      setLikeCount(likeCount + 1);
+    }
+
     setIsLiked(!isLiked);
-    setLikeCount(isLiked ? likeCount - 1 : likeCount + 1);
   };
 
   const handleSave = () => {

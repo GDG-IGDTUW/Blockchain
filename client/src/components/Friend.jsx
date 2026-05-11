@@ -41,9 +41,11 @@ const Friend = ({ friendId, name, subtitle, userPicturePath }) => {
     <FlexBetween sx={{
       p: '0.75rem',
       borderRadius: '0.75rem',
-      transition: '0.2s',
+      transition:
+        'transform 0.2s ease, background-color 0.2s ease',
       '&:hover': {
         backgroundColor: palette.neutral.light,
+        transform: 'translateY(-2px)',
       },
     }}>
       <FlexBetween gap="0.75rem">

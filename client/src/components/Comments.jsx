@@ -89,7 +89,9 @@ const Comments = ({ postId, comments }) => {
           <Box
       sx={{
         backgroundColor: palette.background.alt,
-        borderRadius: '0.75rem',
+        border: `1px solid ${palette.neutral.light}`,
+        borderRadius: '1rem',
+        boxShadow: '0 2px 6px rgba(15,23,42,0.04)',
         p: '0.75rem',
         mb: '1rem',
       }}
